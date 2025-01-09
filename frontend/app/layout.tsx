@@ -33,7 +33,7 @@ export default function RootLayout({
         <SidebarProvider>
           <AppSidebar />
           <main className="w-[calc(100%-20rem)] mx-auto">
-            <SidebarTrigger />
+            {/* <SidebarTrigger /> */}
             {children}
           </main>
         </SidebarProvider>
