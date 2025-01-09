@@ -13,6 +13,7 @@ import {
 import { Post } from "@/components/calendar/types/calendar";
 import { CalendarView } from "@/components/calendar/calendar-view";
 import { UpcomingPosts } from "@/components/calendar/upcoming-posts";
+import SchedulePostDialog from "@/components/dialogs/schedule-post-dialog";
 
 const MONTHS = [
   "January",
@@ -29,24 +30,48 @@ const MONTHS = [
   "December",
 ];
 
-// Sample data - replace with your actual data source
+// Enhanced sample data with more posts and times
 const SAMPLE_POSTS: Post[] = [
   {
     id: "1",
-    title: "Product Launch",
-    scheduledFor: "2023-12-01",
+    title: "Product Launch: New Winter Collection",
+    scheduledFor: "2025-01-01T09:00:00.000Z",
     type: "product",
   },
   {
     id: "2",
-    title: "Holiday Post",
-    scheduledFor: "2023-12-02",
+    title: "Holiday Gift Guide",
+    scheduledFor: "2025-01-02T10:30:00.000Z",
     type: "holiday",
   },
   {
     id: "3",
     title: "Holiday Special Collection",
-    scheduledFor: "2023-12-25",
+    scheduledFor: "2025-01-25T12:00:00.000Z",
+    type: "holiday",
+  },
+  {
+    id: "4",
+    title: "End of Year Sale",
+    scheduledFor: "2025-01-15T15:00:00.000Z",
+    type: "product",
+  },
+  {
+    id: "5",
+    title: "New Year Sneak Peek",
+    scheduledFor: "2025-01-15T16:30:00.000Z",
+    type: "general",
+  },
+  {
+    id: "6",
+    title: "Customer Spotlight",
+    scheduledFor: "2025-01-15T14:00:00.000Z",
+    type: "general",
+  },
+  {
+    id: "7",
+    title: "Holiday Tips & Tricks",
+    scheduledFor: "2025-01-20T11:00:00.000Z",
     type: "holiday",
   },
 ];
@@ -78,11 +103,12 @@ export default function ContentCalendar() {
           </p>
         </div>
         <div className="flex items-center space-x-4">
-          <Button className="bg-purple-600 hover:bg-purple-700">
+          {/* <Button className="bg-purple-600 hover:bg-purple-700">
             <Plus className="mr-2 h-4 w-4" />
             Schedule Post
-          </Button>
-          <Select defaultValue="month">
+          </Button> */}
+          <SchedulePostDialog />
+          {/* <Select defaultValue="month">
             <SelectTrigger className="w-[180px]">
               <SelectValue placeholder="View" />
             </SelectTrigger>
@@ -91,7 +117,7 @@ export default function ContentCalendar() {
               <SelectItem value="week">Week View</SelectItem>
               <SelectItem value="day">Day View</SelectItem>
             </SelectContent>
-          </Select>
+          </Select> */}
         </div>
       </div>
 
