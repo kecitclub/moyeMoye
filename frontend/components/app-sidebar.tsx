@@ -32,8 +32,8 @@ const items = [
     icon: House,
   },
   {
-    title: "Posts",
-    url: "#",
+    title: "Product",
+    url: "/product",
     icon: Plus,
   },
   {
