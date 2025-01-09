@@ -13,6 +13,7 @@ import {
 import { Post } from "@/components/calendar/types/calendar";
 import { CalendarView } from "@/components/calendar/calendar-view";
 import { UpcomingPosts } from "@/components/calendar/upcoming-posts";
+import SchedulePostDialog from "@/components/dialogs/schedule-post-dialog";
 
 const MONTHS = [
   "January",
@@ -102,11 +103,12 @@ export default function ContentCalendar() {
           </p>
         </div>
         <div className="flex items-center space-x-4">
-          <Button className="bg-purple-600 hover:bg-purple-700">
+          {/* <Button className="bg-purple-600 hover:bg-purple-700">
             <Plus className="mr-2 h-4 w-4" />
             Schedule Post
-          </Button>
-          <Select defaultValue="month">
+          </Button> */}
+          <SchedulePostDialog />
+          {/* <Select defaultValue="month">
             <SelectTrigger className="w-[180px]">
               <SelectValue placeholder="View" />
             </SelectTrigger>
@@ -115,7 +117,7 @@ export default function ContentCalendar() {
               <SelectItem value="week">Week View</SelectItem>
               <SelectItem value="day">Day View</SelectItem>
             </SelectContent>
-          </Select>
+          </Select> */}
         </div>
       </div>
 

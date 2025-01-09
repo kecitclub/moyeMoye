@@ -31,9 +31,9 @@ export const SetupFrom = () => {
             <label className="text-sm font-medium">Brand Logo</label>
             <div className="mt-1 border-2 border-dashed rounded-lg p-8">
               <div className="flex flex-col items-center">
-                <Upload className="w-8 h-8 text-gray-400 mb-2" />
-                <div className="text-center">
-                  <p className="text-blue-600">Upload a file</p>
+                <Upload className="w-8 h-8 text-purple-400 mb-2" />
+                <div className="text-center cursor-pointer">
+                  <p className="text-gray-500">Upload a file</p>
                   <p className="text-gray-500 text-sm">or drag and drop</p>
                   <p className="text-gray-400 text-sm">
                     PNG, JPG, GIF up to 10MB
@@ -64,7 +64,9 @@ export const SetupFrom = () => {
           </div>
 
           <div className="flex justify-end">
-            <Button>Next Step</Button>
+            <Button className="bg-purple-600 hover:bg-purple-700">
+              Next Step
+            </Button>
           </div>
         </form>
       </div>
