@@ -46,6 +46,46 @@ dic={
     "Vibe": "Elegant",
     "Texture": "Richly-Grained"
     },
+    
+    "models\models_assets\tables\image copy 9.png": {
+    "Type": "Modern",
+    "Color": "White-Marble",
+    "Appearance": "Glossy",
+    "Vibe": "Luxurious",
+    "Texture": "Smooth"
+    },
+    
+    "models\models_assets\tables\image copy 10.png": {
+    "Type": "Industrial",
+    "Color": "Concrete",
+    "Appearance": "Matte",
+    "Vibe": "Minimalist",
+    "Texture": "Textured"
+    },
+    
+    "models\models_assets\tables\image copy 11.png": {
+    "Type": "Elegant",
+    "Color": "White-Marble",
+    "Appearance": "Polished",
+    "Vibe": "Sophisticated",
+    "Texture": "Veined"
+    },
+    
+    "models\models_assets\tables\image copy 12.png": {
+    "Type": "Modern",
+    "Color": "Black",
+    "Appearance": "Glossy",
+    "Vibe": "Sleek",
+    "Texture": "Smooth"
+    },
+    
+    "models\models_assets\tables\image copy 13.png": {
+    "Type": "Outdoor",
+    "Color": "Honey-Wood",
+    "Appearance": "Natural",
+    "Vibe": "Rustic",
+    "Texture": "Textured"
+    },
         
     "models\models_assets\tables\image copy.png": {
     "Type": "Contemporary",
