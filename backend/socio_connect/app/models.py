@@ -7,9 +7,9 @@ class Brand(models.Model):
     brand_description = models.TextField()
     BRAND_TONE_CHOICES = [
         ('formal', 'Formal'),
+        ('professional', 'Professional'),
+        ('friendly', 'Friendly'),
         ('casual', 'Casual'),
-        ('playful', 'Playful'),
-        ('serious', 'Serious'),
     ]
     brand_tone = models.CharField(
         max_length=50,
