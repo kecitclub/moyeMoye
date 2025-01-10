@@ -5,6 +5,7 @@ import requests
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
+# from . import CommentAnalyzer
 
 
 
@@ -21,27 +22,52 @@ class PostListCreateView(generics.ListCreateAPIView):
     serializer_class = PostSerializer
 
 
-ACCESS_TOKEN = "EAAMqvStx3vIBO1tFMFNQgUSA39sP4w3B0RgkxthGg1xfRxKGijjTKu6dyRxd90onfQL1R7GqZBLuePNHMolu0HjgNZBiRvgM1J2jjYKmkQTRVUQXZAC0ZAFZCeyzV4mgOp9nKmxGyRhNuO1agMOt9LLtAoyWl411rZCPKTwTDmquS6uBMY8FVUzLxhEDQziCOh5DIB6ZCGRVid9hnGegjx7RxA9wOMZD"
+ACCESS_TOKEN = "EAAMqvStx3vIBO2QmgKMXXeqbbBiBhq0mF9sdPZCoeOcM7hMLnIAwb729EnceogO7RtJqfnmlLef5fvr9igsVdQm7wzOq6gjYBQik7MKvHfSZAEHteexszZCzZBZBqDBVqIlcbt2vjHG7C3fLGADZA7kDm61NWqoUObZCgc9AMcXdZCqHDTmgw1U2t733lc7NdB2e"
+INSTAGRAM_ACCOUNT_ID = "17841471750023527"
+
+import cloudinary
+import cloudinary.uploader
+
+
+cloudinary.config(
+    cloud_name = "dxallozr5", 
+    api_key = "459924959317992", 
+    api_secret = "vGshrUjT04Y-XZh3vf_i3CJ6Va4", # Click 'View API Keys' above to copy your API secret
+    secure=True
+)
+
+
+def upload_to_cloudinary(file):
+    response = cloudinary.uploader.upload(file, folder="instagram_posts")
+    print("Uploadeddddddd")
+    return response.get("secure_url")  # Return the public URL of the uploaded image
+
+
+from rest_framework.views import APIView
+from rest_framework.response import Response
+from rest_framework import status
+from .serializers import PostSerializer
+import requests
+
+ACCESS_TOKEN = "EAAMqvStx3vIBO2QmgKMXXeqbbBiBhq0mF9sdPZCoeOcM7hMLnIAwb729EnceogO7RtJqfnmlLef5fvr9igsVdQm7wzOq6gjYBQik7MKvHfSZAEHteexszZCzZBZBqDBVqIlcbt2vjHG7C3fLGADZA7kDm61NWqoUObZCgc9AMcXdZCqHDTmgw1U2t733lc7NdB2e"
 INSTAGRAM_ACCOUNT_ID = "17841471750023527"
 
 class InstagramPostView(APIView):
     def post(self, request, *args, **kwargs):
-        # Parse the request data
         serializer = PostSerializer(data=request.data)
         if serializer.is_valid():
             try:
-                # Extract data from the serializer
-                brand = serializer.validated_data['brand']
-                product = serializer.validated_data['product']
-                caption = f"{brand.brand_name} - {product.product_name}: {serializer.validated_data.get('date_to_be_posted', 'Scheduled Post')}"
+                caption = serializer.validated_data['post_caption']
+                post_image = serializer.validated_data['post_images']
+                print(caption)
 
-                # Use dummy image for now; update as per requirement
-                image_url = "https://plus.unsplash.com/premium_photo-1711051475117-f3a4d3ff6778?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MXx8bGFwdG9wfGVufDB8fDB8fHww"
-
-                # Step 1: Upload the image
+                # Step 1: Upload the image to Cloudinary
+                public_image_url = upload_to_cloudinary(post_image)
+                print("Url", public_image_url)
+                # Step 2: Upload the image to Instagram
                 upload_url = f"https://graph.facebook.com/v16.0/{INSTAGRAM_ACCOUNT_ID}/media"
                 upload_payload = {
-                    "image_url": image_url,
+                    "image_url": public_image_url,
                     "caption": caption,
                     "access_token": ACCESS_TOKEN,
                 }
@@ -50,7 +76,7 @@ class InstagramPostView(APIView):
                 upload_data = upload_response.json()
                 container_id = upload_data.get("id")
 
-                # Step 2: Publish the post
+                # Step 3: Publish the post
                 publish_url = f"https://graph.facebook.com/v16.0/{INSTAGRAM_ACCOUNT_ID}/media_publish"
                 publish_payload = {
                     "creation_id": container_id,
@@ -60,7 +86,7 @@ class InstagramPostView(APIView):
                 publish_response.raise_for_status()
                 publish_data = publish_response.json()
 
-                # Save post in the database
+                # Save the post in the database
                 serializer.save()
                 return Response(
                     {"message": "Post published successfully!", "post_id": publish_data.get("id")},

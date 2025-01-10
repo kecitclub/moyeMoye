@@ -6,4 +6,5 @@ urlpatterns = [
     path('api/products/', AddProductListCreateView.as_view(), name='product-list-create'),
     path('api/posts/', PostListCreateView.as_view(), name='post-list-create'),
     path('api/instagram/post/', InstagramPostView.as_view(), name='instagram-post'),
+    # path('api/')
 ]
