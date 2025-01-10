@@ -12,13 +12,21 @@ from rest_framework.decorators import action
 from django.core.files.base import ContentFile
 
 
-base_path = "/home/ashish/MyPC/Hackathons/Dristi/moyeMoye"
-model_path = os.path.join(base_path, "models")
+# base_path = r"C:\\Users\\mishr\\moyeMoye\\models\\genAndText.py"
+# model_path = os.path.join(base_path, "models")
 
-# Add the model_path to sys.path
-sys.path.append(model_path)
+# # Add the model_path to sys.path
+# sys.path.append(model_path)
 
-from genAndText import product_photo, festive_photo, add_smart_text
+import importlib.util
+
+spec = importlib.util.spec_from_file_location("genAndText", "C:/Users/mishr/moyeMoye/models/genAndText.py")
+genAndText = importlib.util.module_from_spec(spec)
+spec.loader.exec_module(genAndText)
+
+product_photo = genAndText.product_photo
+festive_photo = genAndText.festive_photo
+add_smart_text = genAndText.add_smart_text
 
 class BrandListCreateView(generics.ListCreateAPIView):
     queryset = Brand.objects.all()

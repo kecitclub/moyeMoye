@@ -118,7 +118,53 @@ def create_image_prompt(product,vibe):
 
     return description
 
-def overlay_table(image1_path, image2_path, output_path, offset_ratio=0.0):
+
+import cv2
+from PIL import Image, ImageEnhance
+
+def enhance_colors(image_path):
+    """ Enhance colors and adjust brightness to give a more vibrant look """
+    image = Image.open(image_path)
+    enhancer = ImageEnhance.Color(image)
+    image = enhancer.enhance(1.5)  # Increase color saturation by 50%
+    enhancer = ImageEnhance.Brightness(image)
+    image = enhancer.enhance(1.1)  # Slightly increase the brightness
+    return image
+
+def add_blur_to_background(image_path, focal_point):
+    """ Add selective blur to the background to create depth of field effect """
+    image = cv2.imread(image_path)
+    mask = np.zeros(image.shape[:2], np.uint8)
+    mask[focal_point[1]:focal_point[1]+100, focal_point[0]:focal_point[0]+50] = 255
+    blurred = cv2.GaussianBlur(image, (21, 21), 0)
+    image = cv2.copyTo(blurred, mask, image)
+    cv2.imwrite(image_path, image)
+
+
+
+def adjust_contrast(image):
+    """ Adjust the contrast of the image """
+    enhancer = ImageEnhance.Contrast(image)
+    image = enhancer.enhance(1.25)  # Increase contrast
+    return image
+def final_refinement(image_path):
+    """ Apply a series of refinement steps to the image """
+    try:
+        image = Image.open(image_path)
+
+        enhancer = ImageEnhance.Color(image)
+        image = enhancer.enhance(1.5)  # Increase color saturation by 50%
+
+        image = adjust_contrast(image)
+
+        return image
+    except Exception as e:
+        print("An error occurred:", e)
+        return None
+      
+      
+      
+def overlay_table(image1_path, image2_path, offset_ratio=0.0):
     """
     Overlay two images, where image2 (with transparent background (table)) is placed on top of image1.
     Image2 is resized to match image1's dimensions and can be offset vertically.
@@ -167,7 +213,7 @@ def overlay_table(image1_path, image2_path, output_path, offset_ratio=0.0):
         result = Image.alpha_composite(result, overlay_layer)
 
         # Save the result
-        result.save(output_path, 'PNG')
+        # result.save(output_path, 'PNG')
 
         return result
 
@@ -347,127 +393,113 @@ def choose_table(product, background_prompt):
   """
     Makes call to choose table image as per product
   """
-  dic={
-    "/models_assets/tables/image copy 2.png": {
+  dic = {
+    "C:\\Users\\mishr\\moyeMoye\\models\\models_assets\\tables\\image copy 2.png": {
         "Type": "Wooden",
         "Color": "Brown",
         "Appearance": "Polished",
         "Vibe": "Rustic",
         "Texture": "Grained"
     },
-
-    "/models_assets/tables/image copy 3.png": {
-    "Type": "Modern",
-    "Color": "Light",
-    "Appearance": "Matte",
-    "Vibe": "Minimalist",
-    "Texture": "Smooth"
+    "C:\\Users\\mishr\\moyeMoye\\models\\models_assets\\tables\\image copy 3.png": {
+        "Type": "Modern",
+        "Color": "Light",
+        "Appearance": "Matte",
+        "Vibe": "Minimalist",
+        "Texture": "Smooth"
     },
-
-    "/models_assets/tables/image copy 4.png": {
-    "Type": "Contemporary",
-    "Color": "white",
-    "Appearance": "Polished",
-    "Vibe": "Sleek",
-    "Texture": "Smooth"
+    "C:\\Users\\mishr\\moyeMoye\\models\\models_assets\\tables\\image copy 4.png": {
+        "Type": "Contemporary",
+        "Color": "white",
+        "Appearance": "Polished",
+        "Vibe": "Sleek",
+        "Texture": "Smooth"
     },
-
-    "/models_assets/tables/image copy 6.png": {
-    "Type": "Office",
-    "Color": "Wood",
-    "Appearance": "Matte",
-    "Vibe": "Professional",
-    "Texture": "Smooth"
+    "C:\\Users\\mishr\\moyeMoye\\models\\models_assets\\tables\\image copy 6.png": {
+        "Type": "Office",
+        "Color": "Wood",
+        "Appearance": "Matte",
+        "Vibe": "Professional",
+        "Texture": "Smooth"
     },
-
-    "/models_assets/tables/image copy 7.png":  {
-    "Type": "Dining",
-    "Color": "Light-Wood",
-    "Appearance": "Natural",
-    "Vibe": "Casual",
-    "Texture": "Grained"
+    "C:\\Users\\mishr\\moyeMoye\\models\\models_assets\\tables\\image copy 7.png": {
+        "Type": "Dining",
+        "Color": "Light-Wood",
+        "Appearance": "Natural",
+        "Vibe": "Casual",
+        "Texture": "Grained"
     },
-
-    "/models_assets/tables/image copy 8.png": {
-    "Type": "Rustic",
-    "Color": "Dark-Wood",
-    "Appearance": "Glossy",
-    "Vibe": "Elegant",
-    "Texture": "Richly-Grained"
+    "C:\\Users\\mishr\\moyeMoye\\models\\models_assets\\tables\\image copy 8.png": {
+        "Type": "Rustic",
+        "Color": "Dark-Wood",
+        "Appearance": "Glossy",
+        "Vibe": "Elegant",
+        "Texture": "Richly-Grained"
     },
-
-    "/models_assets/tables/image copy 9.png": {
-    "Type": "Modern",
-    "Color": "White-Marble",
-    "Appearance": "Glossy",
-    "Vibe": "Luxurious",
-    "Texture": "Smooth"
+    "C:\\Users\\mishr\\moyeMoye\\models\\models_assets\\tables\\image copy 9.png": {
+        "Type": "Modern",
+        "Color": "White-Marble",
+        "Appearance": "Glossy",
+        "Vibe": "Luxurious",
+        "Texture": "Smooth"
     },
-
-    "/models_assets/tables/image copy 10.png": {
-    "Type": "Industrial",
-    "Color": "Concrete",
-    "Appearance": "Matte",
-    "Vibe": "Minimalist",
-    "Texture": "Textured"
+    "C:\\Users\\mishr\\moyeMoye\\models\\models_assets\\tables\\image copy 10.png": {
+        "Type": "Industrial",
+        "Color": "Concrete",
+        "Appearance": "Matte",
+        "Vibe": "Minimalist",
+        "Texture": "Textured"
     },
-
-    "/models_assets/tables/image copy 11.png": {
-    "Type": "Elegant",
-    "Color": "White-Marble",
-    "Appearance": "Polished",
-    "Vibe": "Sophisticated",
-    "Texture": "Veined"
+    "C:\\Users\\mishr\\moyeMoye\\models\\models_assets\\tables\\image copy 11.png": {
+        "Type": "Elegant",
+        "Color": "White-Marble",
+        "Appearance": "Polished",
+        "Vibe": "Sophisticated",
+        "Texture": "Veined"
     },
-
-    "/models_assets/tables/image copy 12.png": {
-    "Type": "Modern",
-    "Color": "Black",
-    "Appearance": "Glossy",
-    "Vibe": "Sleek",
-    "Texture": "Smooth"
+    "C:\\Users\\mishr\\moyeMoye\\models\\models_assets\\tables\\image copy 12.png": {
+        "Type": "Modern",
+        "Color": "Black",
+        "Appearance": "Glossy",
+        "Vibe": "Sleek",
+        "Texture": "Smooth"
     },
-
-    "/models_assets/tables/image copy 13.png": {
-    "Type": "Outdoor",
-    "Color": "Honey-Wood",
-    "Appearance": "Natural",
-    "Vibe": "Rustic",
-    "Texture": "Textured"
+    "C:\\Users\\mishr\\moyeMoye\\models\\models_assets\\tables\\image copy 13.png": {
+        "Type": "Outdoor",
+        "Color": "Honey-Wood",
+        "Appearance": "Natural",
+        "Vibe": "Rustic",
+        "Texture": "Textured"
     },
-
-    "/models_assets/tables/image copy.png": {
-    "Type": "Contemporary",
-    "Color": "Natural-Wood",
-    "Appearance": "Satin",
-    "Vibe": "Modern",
-    "Texture": "Smooth-Grained"
+    "C:\\Users\\mishr\\moyeMoye\\models\\models_assets\\tables\\image copy.png": {
+        "Type": "Contemporary",
+        "Color": "Natural-Wood",
+        "Appearance": "Satin",
+        "Vibe": "Modern",
+        "Texture": "Smooth-Grained"
     },
-
-    "/models_assets/tables/image.png":  {
-    "Type": "Craft",
-    "Color": "Light-Wood",
-    "Appearance": "Matte",
-    "Vibe": "Artistic",
-    "Texture": "Fine-Grained"
+    "C:\\Users\\mishr\\moyeMoye\\models\\models_assets\\tables\\image.png": {
+        "Type": "Craft",
+        "Color": "Light-Wood",
+        "Appearance": "Matte",
+        "Vibe": "Artistic",
+        "Texture": "Fine-Grained"
     },
-
-    "/models_assets/tables/table1_trans.png": {
-    "Type": "Rustic",
-    "Color": "Weathered-Wood",
-    "Appearance": "Distressed",
-    "Vibe": "Vintage",
-    "Texture": "Rough-Grained"
+    "C:\\Users\\mishr\\moyeMoye\\models\\models_assets\\tables\\table1_trans.png": {
+        "Type": "Rustic",
+        "Color": "Weathered-Wood",
+        "Appearance": "Distressed",
+        "Vibe": "Vintage",
+        "Texture": "Rough-Grained"
     },
-
-    "/models_assets/tables/table2_trans.png": {
-    "Type": "Picnic",
-    "Color": "Pine-Wood",
-    "Appearance": "Polished",
-    "Vibe": "Country",
-    "Texture": "Smooth"
-    },
-  }
+    "C:\\Users\\mishr\\moyeMoye\\models\\models_assets\\tables\\table2_trans.png": {
+        "Type": "Picnic",
+        "Color": "Pine-Wood",
+        "Appearance": "Polished",
+        "Vibe": "Country",
+        "Texture": "Smooth"
+    }
+}
   prompt = f"""
   You are an expert designer. Based on the background prompt and product name, choose the best table file that complements them.
 
@@ -556,7 +588,7 @@ def festive_photo(festival,vibe='' ):
       print("Both Freepik and Pollination failed to generate an image.")
       return None
 
-  return image
+  return (image, prompt)
 
 import requests
 import json
@@ -580,10 +612,9 @@ def load_image_from_url(url):
     except Exception as e:
         print(f"Error processing image: {e}")
         return None
-
 import time
 
-def product_photo(product,vibe, prod_size=.55, table = True,  prod_img = 'models\models_assets\file.png'):
+def product_photo(product,vibe, offset = .05,prod_size=.55, table = True,  prod_img = '/content/file.png'):
 
 
   while True:
@@ -604,38 +635,32 @@ def product_photo(product,vibe, prod_size=.55, table = True,  prod_img = 'models
     if image is None:
       print("Both Freepik and Pollination failed to generate an image.")
       return None
-
   # display(image)
-  if image:
-      # Generate a unique filename
-      import uuid
-      unique_filename = str(uuid.uuid4()) + ".png"  # Use UUID for uniqueness
-      filepath = os.path.join("/content", unique_filename) # Save in /content directory
+  # if image:
+  #     # Generate a unique filename
+  #     import uuid
+  #     unique_filename = str(uuid.uuid4()) + ".png"  # Use UUID for uniqueness
+  #     filepath = os.path.join("/content", unique_filename) # Save in /content directory
 
-      # Save the image with the unique filename
-      image.save(filepath)
-      print(f"Image saved as: {unique_filename}")
+  #     # Save the image with the unique filename
+  #     image.save(filepath)
+  #     print(f"Image saved as: {unique_filename}")
 
 
   if (table):
     while True:
       try:
-        table_img =overlay_table(unique_filename, choose_table(product, prompt), filepath,.1)
+        image =overlay_table(image, choose_table(product, prompt),.05)
         print("Table overlay successful")
         break
       except:
         continue
   while True:
     try:
-      im = overlay_product(filepath, prod_img, 'image44.png',.05, prod_size)
-      print("Product overlay successful")
+      im = overlay_product(image, prod_img, 'image44.png',offset, prod_size)
+      print("Product overlay ok")
       break
     except:
-      try:
-        im = overlay_product(filepath, 'models\models_assets\file.png', 'image44.png',.05, prod_size)
-        print("Product overlay successful")
-        break
-      except:
         continue
 
 
@@ -652,6 +677,7 @@ def product_photo(product,vibe, prod_size=.55, table = True,  prod_img = 'models
 
     fin_img = load_image_from_url(get_img(task_id)[0])
   except:
+    im = final_refinement('image44.png')
     fin_img = im
   return (fin_img, prompt)
 
@@ -1085,7 +1111,7 @@ from PIL import Image
 def add_smart_text(
     image_path: str,
     image_prompt,
-    main_text: str = None,
+    text: str = None,
     sec_text: str = None,
     font_ratio: float = 0.1,
     font: Optional[str] = None,
