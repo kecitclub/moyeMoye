@@ -50,8 +50,8 @@ class SchedulePost(models.Model):
     
     brand = models.ForeignKey(Brand, on_delete=models.CASCADE, related_name='scheduled_posts')
     product = models.ForeignKey(AddProduct, on_delete=models.CASCADE, related_name='scheduled_posts')
-    post_image = models.ImageField(upload_to='scheduled_post_images/')
-    post_caption = models.CharField(max_length=255)
+    post_image = models.ImageField(upload_to='scheduled_post_images/',null=True)
+    post_caption = models.CharField(max_length=255,null=True)
     post_type = models.CharField(
         max_length=20,
         choices=POST_TYPE_CHOICES,
@@ -59,6 +59,11 @@ class SchedulePost(models.Model):
     )
     scheduled_date = models.DateTimeField()
     date_created = models.DateTimeField(auto_now_add=True)
+    vibe = models.CharField(
+        max_length=50,
+        default='professional'
+    )
+    text = models.CharField(max_length=255)
 
     def __str__(self):
         return f"Scheduled post for {self.product.product_name} on {self.scheduled_date.strftime('%Y-%m-%d')}"

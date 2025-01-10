@@ -1,3 +1,7 @@
+import os
+import io
+import sys
+import requests
 from rest_framework import generics
 from .models import Brand, AddProduct, Post, SchedulePost
 from .serializers import BrandSerializer, AddProductSerializer, PostSerializer,SchedulePostSerializer
@@ -6,10 +10,6 @@ from rest_framework.response import Response
 from rest_framework import status,viewsets
 from rest_framework.decorators import action
 from django.core.files.base import ContentFile
-import os
-import sys
-import io
-
 
 
 base_path = "/home/ashish/MyPC/Hackathons/Dristi/moyeMoye"
@@ -19,7 +19,6 @@ model_path = os.path.join(base_path, "models")
 sys.path.append(model_path)
 
 from image_gen_final import chat, generate_freepik_image, create_image_prompt
-
 
 class BrandListCreateView(generics.ListCreateAPIView):
     queryset = Brand.objects.all()
@@ -54,17 +53,10 @@ def upload_to_cloudinary(file):
     print("Uploadeddddddd")
     return response.get("secure_url")  # Return the public URL of the uploaded image
 
-
-from rest_framework.views import APIView
-from rest_framework.response import Response
-from rest_framework import status
-from .serializers import PostSerializer
-import requests
-
-
 ACCESS_TOKEN = "EAAMqvStx3vIBO2QmgKMXXeqbbBiBhq0mF9sdPZCoeOcM7hMLnIAwb729EnceogO7RtJqfnmlLef5fvr9igsVdQm7wzOq6gjYBQik7MKvHfSZAEHteexszZCzZBZBqDBVqIlcbt2vjHG7C3fLGADZA7kDm61NWqoUObZCgc9AMcXdZCqHDTmgw1U2t733lc7NdB2e"
 INSTAGRAM_ACCOUNT_ID = "17841471750023527"
 
+# class for instant post
 class InstagramPostView(APIView):
     def post(self, request, *args, **kwargs):
         serializer = PostSerializer(data=request.data)
@@ -112,7 +104,7 @@ class InstagramPostView(APIView):
                 )
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-
+# clas for generating the post :
 class SchedulePostViewSet(viewsets.ModelViewSet):
     queryset = SchedulePost.objects.all()
     serializer_class = SchedulePostSerializer
@@ -123,7 +115,7 @@ class SchedulePostViewSet(viewsets.ModelViewSet):
             # Extract data from request
             product_id = request.data.get('product')
             brand_id = request.data.get('brand')
-            caption = request.data.get('caption', '')
+            # caption = request.data.get('caption', '')
             vibe = request.data.get('vibe', 'professional')
             post_type = request.data.get('post_type', 'image_only')
             scheduled_date = request.data.get('scheduled_date')
@@ -150,13 +142,13 @@ class SchedulePostViewSet(viewsets.ModelViewSet):
                 product=product.product_name,
                 vibe=vibe
             )
-            
+
             # Get refined prompt from chat model
             refined_prompt = chat(prompt)
             
             # Generate image using Freepik
             generated_image = generate_freepik_image(refined_prompt)
-            
+            print("THhe image is generated succ")
             if generated_image is None:
                 return Response(
                     {"error": "Failed to generate image"}, 
@@ -171,6 +163,7 @@ class SchedulePostViewSet(viewsets.ModelViewSet):
             # Upload to Cloudinary
             try:
                 cloudinary_url = upload_to_cloudinary(image_io)
+                print(cloudinary_url)
             except Exception as e:
                 return Response(
                     {"error": f"Failed to upload to Cloudinary: {str(e)}"}, 
@@ -181,7 +174,7 @@ class SchedulePostViewSet(viewsets.ModelViewSet):
             scheduled_post = SchedulePost(
                 brand=brand,
                 product=product,
-                post_caption=caption,
+                post_caption="genu",
                 post_type=post_type,
                 scheduled_date=scheduled_date
             )
@@ -204,3 +197,5 @@ class SchedulePostViewSet(viewsets.ModelViewSet):
                 {"error": str(e)}, 
                 status=status.HTTP_500_INTERNAL_SERVER_ERROR
             )
+
+
