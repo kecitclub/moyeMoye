@@ -31,12 +31,24 @@ import { Textarea } from "@/components/ui/textarea";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
+import { Input } from "../ui/input";
+import {
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "../ui/select";
 
 const formSchema = z.object({
   date: z.date({
     required_error: "Please select a date for your post.",
   }),
-  content: z.string().min(1, "Please enter your post content."),
+  vibes: z.string().min(1, "Please enter your post vibes."),
+  product: z.string().min(1, "Please enter your product name."),
+  postType: z.enum(["image_only", "image_and_text"]),
+  text: z.string().optional(),
 });
 
 export default function SchedulePostDialog() {
@@ -91,7 +103,7 @@ export default function SchedulePostDialog() {
       </DialogTrigger>
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
-          <DialogTitle>Schedule a New Post</DialogTitle>
+          <DialogTitle className="mb-1">Schedule a New Post</DialogTitle>
           <DialogDescription>
             Choose a date and enter the content for your scheduled post.
           </DialogDescription>
@@ -141,14 +153,79 @@ export default function SchedulePostDialog() {
             />
             <FormField
               control={form.control}
-              name="content"
+              name="vibes"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Post Content</FormLabel>
+                  <FormLabel>Post Vibes</FormLabel>
                   <FormControl>
-                    <Textarea
-                      placeholder="Enter your post content here..."
-                      className="resize-none"
+                    <Input
+                      type="text"
+                      placeholder="Enter post vibes"
+                      className="w-full"
+                      {...field}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="postType"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Post Type</FormLabel>
+                  <FormControl>
+                    <Select
+                      onValueChange={field.onChange}
+                      defaultValue={field.value || "image_only"}
+                    >
+                      <SelectTrigger className="w-full">
+                        <SelectValue placeholder="Select post type" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectGroup>
+                          <SelectItem value="image_only">Image Only</SelectItem>
+                          <SelectItem value="image_and_text">
+                            Image and Text
+                          </SelectItem>
+                        </SelectGroup>
+                      </SelectContent>
+                    </Select>
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="product"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Product Name</FormLabel>
+                  <FormControl>
+                    <Input
+                      type="text"
+                      placeholder="Enter product name"
+                      className="w-full"
+                      {...field}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="text"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Overlay Text (optional)</FormLabel>
+                  <FormControl>
+                    <Input
+                      type="text"
+                      placeholder="Enter text to overlay on image"
+                      className="w-full"
                       {...field}
                     />
                   </FormControl>

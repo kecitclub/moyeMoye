@@ -6,6 +6,7 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { Post } from "./types/calendar";
+import { useRouter } from "next/navigation";
 
 interface CalendarCellProps {
   date: number;
@@ -22,6 +23,7 @@ export function CalendarCell({
   isToday,
   onClick,
 }: CalendarCellProps) {
+  const router = useRouter();
   const getPostTypeColor = (type?: string) => {
     switch (type) {
       case "product":
@@ -56,6 +58,9 @@ export function CalendarCell({
                     "text-xs rounded-md p-1.5 border truncate",
                     getPostTypeColor(post.type)
                   )}
+                  onClick={() => {
+                    router.push("/post/scheduled/1");
+                  }}
                 >
                   {post.title}
                 </div>
