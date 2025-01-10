@@ -18,7 +18,7 @@ model_path = os.path.join(base_path, "models")
 # Add the model_path to sys.path
 sys.path.append(model_path)
 
-from image_gen_final import chat, generate_freepik_image, create_image_prompt
+from genAndText import product_photo, festive_photo, add_smart_text
 
 class BrandListCreateView(generics.ListCreateAPIView):
     queryset = Brand.objects.all()
@@ -104,98 +104,137 @@ class InstagramPostView(APIView):
                 )
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-# clas for generating the post :
-class SchedulePostViewSet(viewsets.ModelViewSet):
-    queryset = SchedulePost.objects.all()
-    serializer_class = SchedulePostSerializer
 
-    @action(detail=False, methods=['post'])
-    def create_scheduled_post(self, request):
+# views.py
+from rest_framework.views import APIView
+from rest_framework.response import Response
+from rest_framework import status
+from datetime import datetime
+import io
+
+class SchedulePostAPIView(APIView):
+    def post(self, request):
         try:
-            # Extract data from request
-            product_id = request.data.get('product')
-            brand_id = request.data.get('brand')
-            # caption = request.data.get('caption', '')
-            vibe = request.data.get('vibe', 'professional')
-            post_type = request.data.get('post_type', 'image_only')
-            scheduled_date = request.data.get('scheduled_date')
+            # Extract and validate required data
+            required_fields = {
+                'product': request.data.get('product'),
+                'brand': request.data.get('brand'),
+                'product_name': request.data.get('product_name'),
+                'scheduled_date': request.data.get('scheduled_date')
+            }
+            print('data fetched from user')
 
-            # Validate input
-            if not all([product_id, brand_id, scheduled_date]):
+            # Check for missing required fields
+            missing_fields = [field for field, value in required_fields.items() if not value]
+            if missing_fields:
                 return Response(
-                    {"error": "Product, brand, and scheduled date are required"}, 
+                    {"error": f"Missing required fields: {', '.join(missing_fields)}"},
                     status=status.HTTP_400_BAD_REQUEST
                 )
 
+            # Get optional fields with defaults
+            post_image = request.data.get('product_image')
+            vibe = request.data.get('vibe', 'professional')
+            post_type = request.data.get('post_type', 'image_only')
+
+            # Validate scheduled date format
+            try:
+                scheduled_date = datetime.strptime(required_fields['scheduled_date'], '%Y-%m-%d')
+            except ValueError:
+                return Response(
+                    {"error": "Invalid date format. Use YYYY-MM-DD"},
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+            
+            print('validation part done')
+
             # Get product and brand instances
             try:
-                product = AddProduct.objects.get(id=product_id)
-                brand = Brand.objects.get(id=brand_id)
-            except (AddProduct.DoesNotExist, Brand.DoesNotExist):
+                product = AddProduct.objects.select_related('brand').get(id=required_fields['product'])
+                brand = Brand.objects.get(id=required_fields['brand'])
+
+                if product.brand.id != brand.id:
+                    return Response(
+                        {"error": "Product does not belong to the specified brand"},
+                        status=status.HTTP_400_BAD_REQUEST
+                    )
+
+            except AddProduct.DoesNotExist:
                 return Response(
-                    {"error": "Invalid product or brand ID"}, 
+                    {"error": f"Product with ID {required_fields['product']} not found"},
+                    status=status.HTTP_404_NOT_FOUND
+                )
+            except Brand.DoesNotExist:
+                return Response(
+                    {"error": f"Brand with ID {required_fields['brand']} not found"},
                     status=status.HTTP_404_NOT_FOUND
                 )
 
-            # Generate image prompt using AI
-            prompt = create_image_prompt(
-                product=product.product_name,
-                vibe=vibe
-            )
-
-            # Get refined prompt from chat model
-            refined_prompt = chat(prompt)
-            
-            # Generate image using Freepik
-            generated_image = generate_freepik_image(refined_prompt)
-            print("THhe image is generated succ")
-            if generated_image is None:
-                return Response(
-                    {"error": "Failed to generate image"}, 
-                    status=status.HTTP_500_INTERNAL_SERVER_ERROR
-                )
-
-            # Convert PIL Image to file
-            image_io = io.BytesIO()
-            generated_image.save(image_io, format='JPEG')
-            image_io.seek(0)
-
-            # Upload to Cloudinary
+            # Generate image
             try:
+                print('start generating')
+                generated_image = product_photo(
+                    required_fields['product_name'],
+                    vibe,
+                    prod_size=0.55,
+                    table=False,
+                    prod_img='/home/ashish/MyPC/Hackathons/Dristi/moyeMoye/models/models_assets/file.png'
+                )
+                
+                if not generated_image:
+                    return Response(
+                        {"error": "Failed to generate image"},
+                        status=status.HTTP_500_INTERNAL_SERVER_ERROR
+                    )
+                print('generation completed')
+
+                image_io = io.BytesIO()
+                generated_image.save(image_io, format='JPEG', quality=90)
+                image_io.seek(0)
+
                 cloudinary_url = upload_to_cloudinary(image_io)
-                print(cloudinary_url)
+                print("The url ",cloudinary_url)
+                if not cloudinary_url:
+                    return Response(
+                        {"error": "Failed to upload image to Cloudinary"},
+                        status=status.HTTP_500_INTERNAL_SERVER_ERROR
+                    )
+
             except Exception as e:
                 return Response(
-                    {"error": f"Failed to upload to Cloudinary: {str(e)}"}, 
+                    {"error": f"Image processing failed: {str(e)}"},
                     status=status.HTTP_500_INTERNAL_SERVER_ERROR
                 )
 
-            # Create SchedulePost instance
-            scheduled_post = SchedulePost(
-                brand=brand,
-                product=product,
-                post_caption="genu",
-                post_type=post_type,
-                scheduled_date=scheduled_date
-            )
-            
-            # Save the Cloudinary URL to post_image field
-            scheduled_post.post_image = cloudinary_url
-            scheduled_post.save()
+            # Create and save SchedulePost instance
+            try:
+                scheduled_post = SchedulePost.objects.create(
+                    brand=brand,
+                    product=product,
+                    post_caption="Generated Caption",
+                    post_type=post_type,
+                    scheduled_date=scheduled_date,
+                    post_image=cloudinary_url
+                )
 
-            # Return custom response
-            response_data = {
-                "caption": "GyanuChor",
-                "image_url": cloudinary_url,
-                # "post_details": self.get_serializer(scheduled_post).data
-            }
+                response_data = {
+                    "message": "Scheduled post created successfully",
+                    "post_id": scheduled_post.id,
+                    "image_url": cloudinary_url,
+                    "scheduled_date": scheduled_date.strftime('%Y-%m-%d'),
+                    "post_type": post_type
+                }
 
-            return Response(response_data, status=status.HTTP_201_CREATED)
+                return Response(response_data, status=status.HTTP_201_CREATED)
+
+            except ValidationError as e:
+                return Response(
+                    {"error": f"Failed to create scheduled post: {str(e)}"},
+                    status=status.HTTP_400_BAD_REQUEST
+                )
 
         except Exception as e:
             return Response(
-                {"error": str(e)}, 
+                {"error": f"Unexpected error: {str(e)}"},
                 status=status.HTTP_500_INTERNAL_SERVER_ERROR
             )
-
-

@@ -50,6 +50,7 @@ class SchedulePost(models.Model):
     
     brand = models.ForeignKey(Brand, on_delete=models.CASCADE, related_name='scheduled_posts')
     product = models.ForeignKey(AddProduct, on_delete=models.CASCADE, related_name='scheduled_posts')
+    product_name = models.CharField(max_length=255, null=True)
     post_image = models.ImageField(upload_to='scheduled_post_images/',null=True)
     post_caption = models.CharField(max_length=255,null=True)
     post_type = models.CharField(
