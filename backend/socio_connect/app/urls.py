@@ -1,5 +1,11 @@
 from django.urls import path
-from .views import BrandListCreateView, AddProductListCreateView, PostListCreateView,InstagramPostView
+from .views import BrandListCreateView, AddProductListCreateView, PostListCreateView,InstagramPostView,SchedulePostViewSet
+from rest_framework.routers import DefaultRouter
+
+
+router = DefaultRouter()
+router.register(r'schedule-posts', SchedulePostViewSet, basename='schedulepost')
+
 
 urlpatterns = [
     path('api/brands/', BrandListCreateView.as_view(), name='brand-list-create'),
