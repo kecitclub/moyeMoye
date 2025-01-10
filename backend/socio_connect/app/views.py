@@ -13,12 +13,12 @@ import io
 
 
 base_path = "/home/ashish/MyPC/Hackathons/Dristi/moyeMoye"
-model_path = os.path.join(base_path, "models", "image_gen_final.py")
+model_path = os.path.join(base_path, "models")
 
-from model_path import chat, generate_freepik_image, create_image_prompt
+# Add the model_path to sys.path
+sys.path.append(model_path)
 
-
-
+from image_gen_final import chat, generate_freepik_image, create_image_prompt
 
 
 class BrandListCreateView(generics.ListCreateAPIView):
