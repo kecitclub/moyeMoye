@@ -1,11 +1,23 @@
 from rest_framework import generics
-from .models import Brand, AddProduct, Post
-from .serializers import BrandSerializer, AddProductSerializer, PostSerializer
-import requests
+from .models import Brand, AddProduct, Post, SchedulePost
+from .serializers import BrandSerializer, AddProductSerializer, PostSerializer,SchedulePostSerializer
 from rest_framework.views import APIView
 from rest_framework.response import Response
-from rest_framework import status
-# from . import CommentAnalyzer
+from rest_framework import status,viewsets
+from rest_framework.decorators import action
+from django.core.files.base import ContentFile
+import os
+import sys
+import io
+
+
+
+base_path = "/home/ashish/MyPC/Hackathons/Dristi/moyeMoye"
+model_path = os.path.join(base_path, "models", "image_gen_final.py")
+
+from model_path import chat, generate_freepik_image, create_image_prompt
+
+
 
 
 
@@ -48,6 +60,7 @@ from rest_framework.response import Response
 from rest_framework import status
 from .serializers import PostSerializer
 import requests
+
 
 ACCESS_TOKEN = "EAAMqvStx3vIBO2QmgKMXXeqbbBiBhq0mF9sdPZCoeOcM7hMLnIAwb729EnceogO7RtJqfnmlLef5fvr9igsVdQm7wzOq6gjYBQik7MKvHfSZAEHteexszZCzZBZBqDBVqIlcbt2vjHG7C3fLGADZA7kDm61NWqoUObZCgc9AMcXdZCqHDTmgw1U2t733lc7NdB2e"
 INSTAGRAM_ACCOUNT_ID = "17841471750023527"
@@ -98,3 +111,96 @@ class InstagramPostView(APIView):
                     status=status.HTTP_500_INTERNAL_SERVER_ERROR
                 )
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+class SchedulePostViewSet(viewsets.ModelViewSet):
+    queryset = SchedulePost.objects.all()
+    serializer_class = SchedulePostSerializer
+
+    @action(detail=False, methods=['post'])
+    def create_scheduled_post(self, request):
+        try:
+            # Extract data from request
+            product_id = request.data.get('product')
+            brand_id = request.data.get('brand')
+            caption = request.data.get('caption', '')
+            vibe = request.data.get('vibe', 'professional')
+            post_type = request.data.get('post_type', 'image_only')
+            scheduled_date = request.data.get('scheduled_date')
+
+            # Validate input
+            if not all([product_id, brand_id, scheduled_date]):
+                return Response(
+                    {"error": "Product, brand, and scheduled date are required"}, 
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+
+            # Get product and brand instances
+            try:
+                product = AddProduct.objects.get(id=product_id)
+                brand = Brand.objects.get(id=brand_id)
+            except (AddProduct.DoesNotExist, Brand.DoesNotExist):
+                return Response(
+                    {"error": "Invalid product or brand ID"}, 
+                    status=status.HTTP_404_NOT_FOUND
+                )
+
+            # Generate image prompt using AI
+            prompt = create_image_prompt(
+                product=product.product_name,
+                vibe=vibe
+            )
+            
+            # Get refined prompt from chat model
+            refined_prompt = chat(prompt)
+            
+            # Generate image using Freepik
+            generated_image = generate_freepik_image(refined_prompt)
+            
+            if generated_image is None:
+                return Response(
+                    {"error": "Failed to generate image"}, 
+                    status=status.HTTP_500_INTERNAL_SERVER_ERROR
+                )
+
+            # Convert PIL Image to file
+            image_io = io.BytesIO()
+            generated_image.save(image_io, format='JPEG')
+            image_io.seek(0)
+
+            # Upload to Cloudinary
+            try:
+                cloudinary_url = upload_to_cloudinary(image_io)
+            except Exception as e:
+                return Response(
+                    {"error": f"Failed to upload to Cloudinary: {str(e)}"}, 
+                    status=status.HTTP_500_INTERNAL_SERVER_ERROR
+                )
+
+            # Create SchedulePost instance
+            scheduled_post = SchedulePost(
+                brand=brand,
+                product=product,
+                post_caption=caption,
+                post_type=post_type,
+                scheduled_date=scheduled_date
+            )
+            
+            # Save the Cloudinary URL to post_image field
+            scheduled_post.post_image = cloudinary_url
+            scheduled_post.save()
+
+            # Return custom response
+            response_data = {
+                "caption": "GyanuChor",
+                "image_url": cloudinary_url,
+                # "post_details": self.get_serializer(scheduled_post).data
+            }
+
+            return Response(response_data, status=status.HTTP_201_CREATED)
+
+        except Exception as e:
+            return Response(
+                {"error": str(e)}, 
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
