@@ -72,4 +72,26 @@ class SchedulePost(models.Model):
     class Meta:
         ordering = ['scheduled_date']
         
-        
+
+
+class FestivalPost(models.Model):
+    FESTIVAL_CHOICES = [
+        ('lohsar', 'Sonam Losar'),
+        ('maghe_sankranti', 'Maghe Sankranti'),
+        ('saraswati_puja', 'Saraswati Puja'),
+    ]
+
+    festival = models.CharField(max_length=100, choices=FESTIVAL_CHOICES)
+    festival_date = models.DateTimeField()
+    caption = models.TextField()
+    image_url = models.URLField(max_length=300)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        ordering = ['festival_date']
+        verbose_name = 'Festival Post'
+        verbose_name_plural = 'Festival Posts'
+
+    def __str__(self):
+        return f"{self.get_festival_display()} - {self.festival_date.strftime('%Y-%m-%d')}"

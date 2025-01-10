@@ -263,3 +263,102 @@ class SchedulePostAPIView(APIView):
                 {"error": f"Unexpected error: {str(e)}"},
                 status=status.HTTP_500_INTERNAL_SERVER_ERROR
             )
+        
+
+
+# CREATING THE FESTIVE POSTSS:::
+
+# views.py
+from django.shortcuts import render
+from django.http import JsonResponse
+from django.views.decorators.http import require_http_methods
+from django.contrib.admin.views.decorators import staff_member_required
+from django.db import transaction
+from datetime import datetime
+from .models import FestivalPost
+from moyeMoye.backend.socio_connect.media.festivScript import create_festival_dictionary
+
+@staff_member_required
+@require_http_methods(["POST"])
+@transaction.atomic
+def populate_festival_posts(request):
+    try:
+        # Check if posts already exist
+        if FestivalPost.objects.exists():
+            return JsonResponse({
+                'status': 'error',
+                'message': 'Festival posts already exist in the database. Please clear existing data first.'
+            }, status=400)
+
+        # Get festival data from script
+        festival_data = create_festival_dictionary()
+        posts_created = 0
+
+        # Create posts for each festival
+        for festival, data in festival_data.items():
+            festival_date = datetime.strptime(data['date'], '%Y-%m-%dT%H:%M:%S.%fZ')
+            
+            for post in data['posts']:
+                FestivalPost.objects.create(
+                    festival=festival,
+                    festival_date=festival_date,
+                    caption=post['caption'],
+                    image_url=post['url']
+                )
+                posts_created += 1
+
+        return JsonResponse({
+            'status': 'success',
+            'message': f'Successfully created {posts_created} festival posts',
+            'posts_created': posts_created
+        })
+
+    except Exception as e:
+        return JsonResponse({
+            'status': 'error',
+            'message': str(e)
+        }, status=500)
+
+@require_http_methods(["GET"])
+def get_festival_posts(request, festival=None):
+    try:
+        if festival:
+            posts = FestivalPost.objects.filter(festival=festival)
+        else:
+            posts = FestivalPost.objects.all()
+
+        posts_data = []
+        for post in posts:
+            posts_data.append({
+                'festival': post.get_festival_display(),
+                'festival_date': post.festival_date.isoformat(),
+                'caption': post.caption,
+                'image_url': post.image_url
+            })
+
+        return JsonResponse({
+            'status': 'success',
+            'posts': posts_data
+        })
+
+    except Exception as e:
+        return JsonResponse({
+            'status': 'error',
+            'message': str(e)
+        }, status=500)
+
+@staff_member_required
+@require_http_methods(["DELETE"])
+@transaction.atomic
+def clear_festival_posts(request):
+    try:
+        deleted_count = FestivalPost.objects.all().delete()[0]
+        return JsonResponse({
+            'status': 'success',
+            'message': f'Successfully deleted {deleted_count} festival posts'
+        })
+    except Exception as e:
+        return JsonResponse({
+            'status': 'error',
+            'message': str(e)
+        }, status=500)
