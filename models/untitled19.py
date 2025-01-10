@@ -346,127 +346,113 @@ def choose_table(product, background_prompt):
   """
     Makes call to choose table image as per product
   """
-  dic={
-    "/content/models/models_assets/tables/image copy 2.png": {
+  dic = {
+    "C:\\Users\\mishr\\moyeMoye\\models\\models_assets\\tables\\image copy 2.png": {
         "Type": "Wooden",
         "Color": "Brown",
         "Appearance": "Polished",
         "Vibe": "Rustic",
         "Texture": "Grained"
     },
-
-    "/content/models/models_assets/tables/image copy 3.png": {
-    "Type": "Modern",
-    "Color": "Light",
-    "Appearance": "Matte",
-    "Vibe": "Minimalist",
-    "Texture": "Smooth"
+    "C:\\Users\\mishr\\moyeMoye\\models\\models_assets\\tables\\image copy 3.png": {
+        "Type": "Modern",
+        "Color": "Light",
+        "Appearance": "Matte",
+        "Vibe": "Minimalist",
+        "Texture": "Smooth"
     },
-
-    "/content/models/models_assets/tables/image copy 4.png": {
-    "Type": "Contemporary",
-    "Color": "white",
-    "Appearance": "Polished",
-    "Vibe": "Sleek",
-    "Texture": "Smooth"
+    "C:\\Users\\mishr\\moyeMoye\\models\\models_assets\\tables\\image copy 4.png": {
+        "Type": "Contemporary",
+        "Color": "white",
+        "Appearance": "Polished",
+        "Vibe": "Sleek",
+        "Texture": "Smooth"
     },
-
-    "/content/models/models_assets/tables/image copy 6.png": {
-    "Type": "Office",
-    "Color": "Wood",
-    "Appearance": "Matte",
-    "Vibe": "Professional",
-    "Texture": "Smooth"
+    "C:\\Users\\mishr\\moyeMoye\\models\\models_assets\\tables\\image copy 6.png": {
+        "Type": "Office",
+        "Color": "Wood",
+        "Appearance": "Matte",
+        "Vibe": "Professional",
+        "Texture": "Smooth"
     },
-
-    "/content/models/models_assets/tables/image copy 7.png":  {
-    "Type": "Dining",
-    "Color": "Light-Wood",
-    "Appearance": "Natural",
-    "Vibe": "Casual",
-    "Texture": "Grained"
+    "C:\\Users\\mishr\\moyeMoye\\models\\models_assets\\tables\\image copy 7.png": {
+        "Type": "Dining",
+        "Color": "Light-Wood",
+        "Appearance": "Natural",
+        "Vibe": "Casual",
+        "Texture": "Grained"
     },
-
-    "/content/models/models_assets/tables/image copy 8.png": {
-    "Type": "Rustic",
-    "Color": "Dark-Wood",
-    "Appearance": "Glossy",
-    "Vibe": "Elegant",
-    "Texture": "Richly-Grained"
+    "C:\\Users\\mishr\\moyeMoye\\models\\models_assets\\tables\\image copy 8.png": {
+        "Type": "Rustic",
+        "Color": "Dark-Wood",
+        "Appearance": "Glossy",
+        "Vibe": "Elegant",
+        "Texture": "Richly-Grained"
     },
-
-    "/content/models/models_assets/tables/image copy 9.png": {
-    "Type": "Modern",
-    "Color": "White-Marble",
-    "Appearance": "Glossy",
-    "Vibe": "Luxurious",
-    "Texture": "Smooth"
+    "C:\\Users\\mishr\\moyeMoye\\models\\models_assets\\tables\\image copy 9.png": {
+        "Type": "Modern",
+        "Color": "White-Marble",
+        "Appearance": "Glossy",
+        "Vibe": "Luxurious",
+        "Texture": "Smooth"
     },
-
-    "/content/models/models_assets/tables/image copy 10.png": {
-    "Type": "Industrial",
-    "Color": "Concrete",
-    "Appearance": "Matte",
-    "Vibe": "Minimalist",
-    "Texture": "Textured"
+    "C:\\Users\\mishr\\moyeMoye\\models\\models_assets\\tables\\image copy 10.png": {
+        "Type": "Industrial",
+        "Color": "Concrete",
+        "Appearance": "Matte",
+        "Vibe": "Minimalist",
+        "Texture": "Textured"
     },
-
-    "/content/models/models_assets/tables/image copy 11.png": {
-    "Type": "Elegant",
-    "Color": "White-Marble",
-    "Appearance": "Polished",
-    "Vibe": "Sophisticated",
-    "Texture": "Veined"
+    "C:\\Users\\mishr\\moyeMoye\\models\\models_assets\\tables\\image copy 11.png": {
+        "Type": "Elegant",
+        "Color": "White-Marble",
+        "Appearance": "Polished",
+        "Vibe": "Sophisticated",
+        "Texture": "Veined"
     },
-
-    "/content/models/models_assets/tables/image copy 12.png": {
-    "Type": "Modern",
-    "Color": "Black",
-    "Appearance": "Glossy",
-    "Vibe": "Sleek",
-    "Texture": "Smooth"
+    "C:\\Users\\mishr\\moyeMoye\\models\\models_assets\\tables\\image copy 12.png": {
+        "Type": "Modern",
+        "Color": "Black",
+        "Appearance": "Glossy",
+        "Vibe": "Sleek",
+        "Texture": "Smooth"
     },
-
-    "/content/models/models_assets/tables/image copy 13.png": {
-    "Type": "Outdoor",
-    "Color": "Honey-Wood",
-    "Appearance": "Natural",
-    "Vibe": "Rustic",
-    "Texture": "Textured"
+    "C:\\Users\\mishr\\moyeMoye\\models\\models_assets\\tables\\image copy 13.png": {
+        "Type": "Outdoor",
+        "Color": "Honey-Wood",
+        "Appearance": "Natural",
+        "Vibe": "Rustic",
+        "Texture": "Textured"
     },
-
-    "/content/models/models_assets/tables/image copy.png": {
-    "Type": "Contemporary",
-    "Color": "Natural-Wood",
-    "Appearance": "Satin",
-    "Vibe": "Modern",
-    "Texture": "Smooth-Grained"
+    "C:\\Users\\mishr\\moyeMoye\\models\\models_assets\\tables\\image copy.png": {
+        "Type": "Contemporary",
+        "Color": "Natural-Wood",
+        "Appearance": "Satin",
+        "Vibe": "Modern",
+        "Texture": "Smooth-Grained"
     },
-
-    "/content/models/models_assets/tables/image.png":  {
-    "Type": "Craft",
-    "Color": "Light-Wood",
-    "Appearance": "Matte",
-    "Vibe": "Artistic",
-    "Texture": "Fine-Grained"
+    "C:\\Users\\mishr\\moyeMoye\\models\\models_assets\\tables\\image.png": {
+        "Type": "Craft",
+        "Color": "Light-Wood",
+        "Appearance": "Matte",
+        "Vibe": "Artistic",
+        "Texture": "Fine-Grained"
     },
-
-    "/content/models/models_assets/tables/table1_trans.png": {
-    "Type": "Rustic",
-    "Color": "Weathered-Wood",
-    "Appearance": "Distressed",
-    "Vibe": "Vintage",
-    "Texture": "Rough-Grained"
+    "C:\\Users\\mishr\\moyeMoye\\models\\models_assets\\tables\\table1_trans.png": {
+        "Type": "Rustic",
+        "Color": "Weathered-Wood",
+        "Appearance": "Distressed",
+        "Vibe": "Vintage",
+        "Texture": "Rough-Grained"
     },
-
-    "/content/models/models_assets/tables/table2_trans.png": {
-    "Type": "Picnic",
-    "Color": "Pine-Wood",
-    "Appearance": "Polished",
-    "Vibe": "Country",
-    "Texture": "Smooth"
-    },
-  }
+    "C:\\Users\\mishr\\moyeMoye\\models\\models_assets\\tables\\table2_trans.png": {
+        "Type": "Picnic",
+        "Color": "Pine-Wood",
+        "Appearance": "Polished",
+        "Vibe": "Country",
+        "Texture": "Smooth"
+    }
+}
   prompt = f"""
   You are an expert designer. Based on the background prompt and product name, choose the best table file that complements them.
 
@@ -649,7 +635,7 @@ def product_photo(product,vibe, offset = .05,prod_size=.55, table = True,  prod_
       # Generate a unique filename
       import uuid
       unique_filename = str(uuid.uuid4()) + ".png"  # Use UUID for uniqueness
-      filepath = os.path.join("/content", unique_filename) # Save in /content directory
+      filepath = os.path.join(r"C:\Users\mishr\moyeMoye\models\models_assets", unique_filename)
 
       # Save the image with the unique filename
       image.save(filepath)
@@ -688,7 +674,16 @@ def product_photo(product,vibe, offset = .05,prod_size=.55, table = True,  prod_
   except:
     im = final_refinement('image44.png')
     fin_img = im
+  
+  if fin_img.mode != 'RGB':
+    fin_img = fin_img.convert('RGB')
   return (fin_img, prompt)
+# Save the image as a JPG file
+#   fin_img.save('C:\Users\mishr\moyeMoye\models\models_assets\generated_output\output.jpg', 'JPEG')
+#   print('done')
+#   return ('C:\Users\mishr\moyeMoye\models\models_assets\generated_output\output.jpg', prompt)
+
+
 
 from PIL import Image, ImageDraw, ImageFont
 import textwrap
@@ -860,6 +855,9 @@ def add_text(
                     x_current += char_width
             else:
                 draw.text((x, y), line, font=sec_font, fill=color)
+    
+    if img.mode != 'RGB':
+        img = img.convert('RGB')
 
     return img
 
@@ -952,10 +950,6 @@ def add_bottom_gradient_overlay(image_path, primary_color):
     result = Image.alpha_composite(img, overlay)
 
     return result
-
-#  Example usage:
-image = add_bottom_gradient_overlay(im, 'red')
-image
 
 def add_bottom_text(
     image_path: str,
@@ -1152,10 +1146,10 @@ def get_font_location(font_name=None):
     if font_name:
         for font in font_files:
             if font_name.lower() in font.lower():  # Case-insensitive search
-                return '/content/fonts/' + font
+                return os.path.join(r'C:\Users\mishr\moyeMoye\models\models_assets\Fonts' ,font)
         return f"Font '{font_name}' not found."
     else:
-        return '/content/fonts/' + random.choice(font_files)
+        return os.path.join(r'C:\Users\mishr\moyeMoye\models\models_assets\Fonts', random.choice(font_files))
 
 
 def get_nepali_font_path():
@@ -1173,7 +1167,7 @@ def get_nepali_font_path():
     random_font = random.choice(fonts)
 
     # Return the full path
-    return os.path.abspath('/content/fonts/'+random_font)
+    return os.path.join(r'C:\Users\mishr\moyeMoye\models\models_assets\Fonts',random_font)
 
 from typing import Optional, Tuple, Literal
 from PIL import Image
@@ -1327,3 +1321,10 @@ def add_smart_text(
             primary_color=primary_color
         )
 
+
+# img,p = product_photo('Drink', 'refreshing', offset = .05,prod_size=.55, table = True,  prod_img = 'C:\\Users\\mishr\\moyeMoye\\models\\models_assets\\file.png')
+# txt_added = add_smart_text(img, image_prompt=p, text_color=(255, 255, 255), primary_color=(0, 0, 0))
+# if txt_added.mode != 'RGB':
+#   txt_added = txt_added.convert('RGB')
+# txt_added.show()
+# txt_added.save('C:\\Users\\mishr\\moyeMoye\\models\\models_assets\\generated_output\\output.jpg', 'JPEG')

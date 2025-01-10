@@ -20,7 +20,7 @@ from django.core.files.base import ContentFile
 
 import importlib.util
 
-spec = importlib.util.spec_from_file_location("genAndText", "C:/Users/mishr/moyeMoye/models/genAndText.py")
+spec = importlib.util.spec_from_file_location("genAndText", "C:/Users/mishr/moyeMoye/models/untitled19.py")
 genAndText = importlib.util.module_from_spec(spec)
 spec.loader.exec_module(genAndText)
 
@@ -60,6 +60,20 @@ def upload_to_cloudinary(file):
     response = cloudinary.uploader.upload(file, folder="instagram_posts")
     print("Uploadeddddddd")
     return response.get("secure_url")  # Return the public URL of the uploaded image
+
+def upload_pil_image_to_cloudinary(pil_image):
+    try:
+        # Convert PIL image to byte stream
+        byte_stream = BytesIO()
+        pil_image.save(byte_stream, format='JPEG', quality=90)
+        byte_stream.seek(0)
+
+        # Upload to Cloudinary
+        response = cloudinary.uploader.upload(byte_stream, resource_type="image")
+        return response['secure_url']
+    except Exception as e:
+        print(f"Cloudinary upload error: {str(e)}")
+        return None
 
 ACCESS_TOKEN = "EAAMqvStx3vIBO2QmgKMXXeqbbBiBhq0mF9sdPZCoeOcM7hMLnIAwb729EnceogO7RtJqfnmlLef5fvr9igsVdQm7wzOq6gjYBQik7MKvHfSZAEHteexszZCzZBZBqDBVqIlcbt2vjHG7C3fLGADZA7kDm61NWqoUObZCgc9AMcXdZCqHDTmgw1U2t733lc7NdB2e"
 INSTAGRAM_ACCOUNT_ID = "17841471750023527"
@@ -119,6 +133,7 @@ from rest_framework.response import Response
 from rest_framework import status
 from datetime import datetime
 import io
+from io import BytesIO
 
 class SchedulePostAPIView(APIView):
     def post(self, request):
@@ -144,6 +159,7 @@ class SchedulePostAPIView(APIView):
             post_image = request.data.get('product_image')
             vibe = request.data.get('vibe', 'professional')
             post_type = request.data.get('post_type', 'image_only')
+            post_caption = request.data.get('text', '')
 
             # Validate scheduled date format
             try:
@@ -179,15 +195,18 @@ class SchedulePostAPIView(APIView):
                 )
 
             # Generate image
+
             try:
                 print('start generating')
-                generated_image = product_photo(
+                generated_image, p = product_photo(
                     required_fields['product_name'],
                     vibe,
                     prod_size=0.55,
                     table=False,
-                    prod_img='/home/ashish/MyPC/Hackathons/Dristi/moyeMoye/models/models_assets/file.png'
+                    prod_img='C:\\Users\\mishr\\moyeMoye\\models\\models_assets\\file.png'
                 )
+                
+                
                 
                 if not generated_image:
                     return Response(
@@ -196,17 +215,15 @@ class SchedulePostAPIView(APIView):
                     )
                 print('generation completed')
 
-                image_io = io.BytesIO()
-                generated_image.save(image_io, format='JPEG', quality=90)
-                image_io.seek(0)
-
-                cloudinary_url = upload_to_cloudinary(image_io)
-                print("The url ",cloudinary_url)
+                # Upload the PIL Image directly to Cloudinary
+                cloudinary_url = upload_pil_image_to_cloudinary(generated_image)
+                
                 if not cloudinary_url:
                     return Response(
                         {"error": "Failed to upload image to Cloudinary"},
                         status=status.HTTP_500_INTERNAL_SERVER_ERROR
                     )
+                print("The url ", cloudinary_url)
 
             except Exception as e:
                 return Response(

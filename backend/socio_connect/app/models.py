@@ -71,3 +71,5 @@ class SchedulePost(models.Model):
 
     class Meta:
         ordering = ['scheduled_date']
+        
+        
