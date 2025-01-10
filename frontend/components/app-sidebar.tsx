@@ -1,3 +1,5 @@
+"use client";
+
 import {
   Sidebar,
   SidebarContent,
@@ -14,8 +16,10 @@ import {
   ChartNoAxesCombined,
   ChevronUp,
   House,
-  MessageSquareMore,
+  Moon,
+  PenLine,
   Plus,
+  Sun,
   User2,
 } from "lucide-react";
 import {
@@ -24,6 +28,9 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { usePathname } from "next/navigation";
+import { DropdownMenuSeparator } from "@radix-ui/react-dropdown-menu";
+import { useTheme } from "next-themes";
 
 const items = [
   {
@@ -37,27 +44,30 @@ const items = [
     icon: Plus,
   },
   {
+    title: "Post",
+    url: "/post",
+    icon: PenLine,
+  },
+  {
     title: "Schedule",
     url: "/calendar",
     icon: CalendarSync,
   },
   {
-    title: "Replies",
-    url: "#",
-    icon: MessageSquareMore,
-  },
-  {
     title: "Analytics",
-    url: "#",
+    url: "/analytics",
     icon: ChartNoAxesCombined,
   },
 ];
 
 export const AppSidebar = () => {
+  const pathname = usePathname();
+  const { theme, setTheme } = useTheme();
+
   return (
-    <Sidebar>
-      <SidebarHeader>
-        <h1 className="text-purple-600 font-bold text-xl pl-2">
+    <Sidebar className="border-r">
+      <SidebarHeader className="border-b px-4 py-6">
+        <h1 className="text-purple-600 font-bold text-2xl">
           <a href="/">SocioConnect</a>
         </h1>
       </SidebarHeader>
@@ -67,9 +77,13 @@ export const AppSidebar = () => {
             <SidebarMenu>
               {items.map((item) => (
                 <SidebarMenuItem key={item.title}>
-                  <SidebarMenuButton asChild>
+                  <SidebarMenuButton
+                    asChild
+                    isActive={pathname === item.url}
+                    className="gap-3 px-4 py-2"
+                  >
                     <a href={item.url}>
-                      <item.icon />
+                      <item.icon className="h-5 w-5" />
                       <span>{item.title}</span>
                     </a>
                   </SidebarMenuButton>
@@ -79,17 +93,19 @@ export const AppSidebar = () => {
           </SidebarGroupContent>
         </SidebarGroup>
       </SidebarContent>
-      <SidebarFooter>
+      <SidebarFooter className="border-t p-4">
         <SidebarMenu>
           <SidebarMenuItem>
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <SidebarMenuButton>
-                  <User2 /> Username
-                  <ChevronUp className="ml-auto" />
+                <SidebarMenuButton className="w-full gap-3">
+                  <User2 className="h-5 w-5" />
+                  <span>Username</span>
+                  <ChevronUp className="ml-auto h-5 w-5" />
                 </SidebarMenuButton>
               </DropdownMenuTrigger>
               <DropdownMenuContent
+                align="start"
                 side="top"
                 className="w-[--radix-popper-anchor-width]"
               >
@@ -101,6 +117,22 @@ export const AppSidebar = () => {
                 </DropdownMenuItem>
                 <DropdownMenuItem>
                   <span>Sign out</span>
+                </DropdownMenuItem>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem
+                  onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
+                >
+                  {theme === "dark" ? (
+                    <>
+                      <Sun className="mr-2 h-4 w-4" />
+                      <span>Light Mode</span>
+                    </>
+                  ) : (
+                    <>
+                      <Moon className="mr-2 h-4 w-4" />
+                      <span>Dark Mode</span>
+                    </>
+                  )}
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
