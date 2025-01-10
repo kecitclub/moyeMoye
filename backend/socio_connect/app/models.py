@@ -34,8 +34,11 @@ class AddProduct(models.Model):
 class Post(models.Model):
     brand = models.ForeignKey(Brand, on_delete=models.CASCADE, related_name='posts')
     product = models.ForeignKey(AddProduct, on_delete=models.CASCADE, related_name='posts')
+    post_images = models.ImageField(upload_to='post_images/')
+    post_caption = models.CharField(max_length=255)
     date_created = models.DateTimeField(auto_now_add=True)
-    date_to_be_posted = models.DateTimeField()
+    date_to_be_posted = models.DateTimeField(null=True)
+
 
     def __str__(self):
         return f"Post for {self.brand.brand_name} - {self.product.product_name} on {self.date_to_be_posted.strftime('%Y-%m-%d')}"

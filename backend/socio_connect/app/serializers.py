@@ -9,9 +9,9 @@ class BrandSerializer(serializers.ModelSerializer):
 class AddProductSerializer(serializers.ModelSerializer):
     class Meta:
         model = AddProduct
-        fields = ['id', 'product_name', 'product_images', 'description']
+        fields = ['id', 'product_name', 'product_images', 'description_about_product','brand']
 
 class PostSerializer(serializers.ModelSerializer):
     class Meta:
         model = Post
-        fields = ['id', 'brand', 'product', 'date_created', 'date_to_be_posted']
+        fields = ['id', 'brand', 'product','post_images','post_caption', 'date_created', 'date_to_be_posted']
