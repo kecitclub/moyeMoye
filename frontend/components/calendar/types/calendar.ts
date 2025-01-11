@@ -1,9 +1,4 @@
-export interface Post {
-  id: string;
-  title: string;
-  scheduledFor: string;
-  type?: "product" | "holiday" | "general";
-}
+import { Post } from "@/app/calendar/posts";
 
 export interface CalendarDay {
   date: number;

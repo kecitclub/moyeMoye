@@ -1,6 +1,8 @@
+import { AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ACCESS_TOKEN, INSTAGRAM_ACCOUNT_ID } from "@/constants/constants";
+import { Avatar } from "@radix-ui/react-avatar";
 import { Eye } from "lucide-react";
 
 const getInstagramAnalytics = async (id: string) => {
@@ -32,98 +34,63 @@ export default async function SingleAnalyticsPage({
   const comments = await getComments(id);
   console.log(comments);
   return (
-    <div className="p-6 space-y-6">
+    <div className="p-6 space-y-8">
       <div className="flex justify-between items-center">
-        <h1 className="text-2xl font-bold">Instagram Analytics</h1>
+        <h1 className="text-xl font-semibold">Instagram Analytics</h1>
         {/* <Button className="bg-[#3B82F6] hover:bg-[#2563EB]"> */}
       </div>
 
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-sm font-medium text-muted-foreground">
-              Total Engagement
-            </CardTitle>
-            <span className="text-xs font-medium text-green-500 bg-green-50 px-2 py-1 rounded">
-              +12%
-            </span>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">24.5K</div>
-            <div className="mt-4 h-2 w-full bg-gray-100 rounded">
-              {/* <div className="h-2 w-3/4 bg-[#3B82F6] rounded" /> */}
-              <div className="h-2 w-3/4 bg-[#A855F7] rounded"></div>
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-sm font-medium text-muted-foreground">
-              Scheduled Posts
-            </CardTitle>
-            <span className="text-xs font-medium text-blue-500 bg-blue-50 px-2 py-1 rounded">
-              Next 7 days
-            </span>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">12</div>
-            <div className="mt-4 h-2 w-full bg-gray-100 rounded">
-              {/* <div className="h-2 w-1/2 bg-green-500 rounded" /> */}
-              <div className="h-2 w-1/2 bg-[#A855F7] rounded" />
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-sm font-medium text-muted-foreground">
-              Recent Comments
-            </CardTitle>
-            <span className="text-xs font-medium text-yellow-500 bg-yellow-50 px-2 py-1 rounded">
-              Needs Response
-            </span>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">89</div>
-            <div className="mt-4 h-2 w-full bg-gray-100 rounded">
-              {/* <div className="h-2 w-4/5 bg-yellow-500 rounded" /> */}
-              <div className="h-2 w-4/5 bg-[#A855F7] rounded"></div>
-            </div>
-          </CardContent>
-        </Card>
-      </div>
-
-      <div className="grid gap-6 md:grid-cols-2">
-        <Card>
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <Card className="col-span-2 bg-white border border-gray-200 rounded-lg">
           <CardHeader>
-            <CardTitle>Upcoming Posts</CardTitle>
+            <div className="flex items-start space-x-4">
+              <Avatar className="w-14 h-14 rounded-full">
+                <AvatarImage
+                  src="https://github.com/shadcn.png"
+                  className="object-cover w-full h-full rounded-full"
+                />
+                <AvatarFallback>CN</AvatarFallback>
+              </Avatar>
+
+              <div className="flex-1">
+                <h3 className="font-semibold">Instagram Post</h3>
+                <p className="text-sm text-gray-500">Posted on June 15, 2023</p>
+              </div>
+
+              <Button className="bg-indigo-50 text-indigo-600 text-sm font-medium hover:bg-indigo-100">
+                View Post
+              </Button>
+            </div>
           </CardHeader>
           <CardContent>
-            <div className="space-y-4">
-              <div className="flex items-center space-x-4">
-                <div className="w-[100px] h-[100px] bg-gray-200 rounded" />
-                <div className="space-y-1">
-                  <h3 className="font-medium">New Product Launch</h3>
-                  <p className="text-sm text-muted-foreground">
-                    Scheduled for tomorrow at 10:00 AM
-                  </p>
+            <div className="mt-6 grid grid-cols-2 lg:grid-cols-4 gap-4">
+              <div className="bg-gray-50 border border-gray-100 rounded-lg p-4">
+                <div className="text-sm text-gray-500">Views</div>
+                <div className="text-2xl font-bold mt-1">12.5K</div>
+                <div className="text-xs text-green-600 mt-1">
+                  ↑ 23% vs last post
                 </div>
-                <Button variant="ghost" size="icon">
-                  <Eye className="h-4 w-4" />
-                </Button>
               </div>
-              <div className="flex items-center space-x-4">
-                <div className="w-[100px] h-[100px] bg-gray-200 rounded" />
-                <div className="space-y-1">
-                  <h3 className="font-medium">Weekly Tips</h3>
-                  <p className="text-sm text-muted-foreground">
-                    Scheduled for Friday at 2:00 PM
-                  </p>
+              <div className="bg-gray-50 border border-gray-100 rounded-lg p-4">
+                <div className="text-sm text-gray-500">Likes</div>
+                <div className="text-2xl font-bold mt-1">1.5K</div>
+                <div className="text-xs text-green-600 mt-1">
+                  ↑ 15% vs last post
                 </div>
-                <Button variant="ghost" size="icon">
-                  <Eye className="h-4 w-4" />
-                </Button>
+              </div>
+              <div className="bg-gray-50 border border-gray-100 rounded-lg p-4">
+                <div className="text-sm text-gray-500">Comments</div>
+                <div className="text-2xl font-bold mt-1">284</div>
+                <div className="text-xs text-green-600 mt-1">
+                  ↓ 5% vs last post
+                </div>
+              </div>
+              <div className="bg-gray-50 border border-gray-100 rounded-lg p-4">
+                <div className="text-sm text-gray-500">Shares</div>
+                <div className="text-2xl font-bold mt-1">156</div>
+                <div className="text-xs text-green-600 mt-1">
+                  ↑ 8% vs last post
+                </div>
               </div>
             </div>
           </CardContent>
@@ -131,41 +98,105 @@ export default async function SingleAnalyticsPage({
 
         <Card>
           <CardHeader>
-            <CardTitle>Recent Performance</CardTitle>
+            <h3 className="font-semibold">Sentiment Analysis</h3>
           </CardHeader>
           <CardContent>
-            <div className="h-[200px] flex items-center justify-center bg-gray-50 rounded">
-              Performance Chart
+            <div className="space-y-6">
+              <div>
+                <div className="flex justify-between mb-2">
+                  <span className="text-sm text-gray-500">Positive</span>
+                  <span className="text-sm font-medium">65%</span>
+                </div>
+                <div className="h-2 bg-gray-100 rounded-full">
+                  <div className="h-2 bg-green-500 rounded-full w-[65%]"></div>
+                </div>
+              </div>
+              <div>
+                <div className="flex justify-between mb-2">
+                  <span className="text-sm text-gray-500">Neutral</span>
+                  <span className="text-sm font-medium">25%</span>
+                </div>
+                <div className="h-2 bg-gray-100 rounded-full">
+                  <div className="h-2 bg-gray-500 rounded-full w-[25%]"></div>
+                </div>
+              </div>
+              <div>
+                <div className="flex justify-between mb-2">
+                  <span className="text-sm text-gray-500">Negative</span>
+                  <span className="text-sm font-medium">10%</span>
+                </div>
+                <div className="h-2 bg-gray-100 rounded-full">
+                  <div className="h-2 bg-red-500 rounded-full w-[10%]"></div>
+                </div>
+              </div>
+              <div className="mt-6">
+                <h4 className="font-medium mb-4">Common Keywords</h4>
+                <div className="flex flex-wrap gap-2">
+                  <span className="px-3 py-1 bg-gray-50 border border-gray-100 rounded-full text-sm">
+                    amazing
+                  </span>
+                  <span className="px-3 py-1 bg-gray-50 border border-gray-100 rounded-full text-sm">
+                    love it
+                  </span>
+                  <span className="px-3 py-1 bg-gray-50 border border-gray-100 rounded-full text-sm">
+                    great
+                  </span>
+                </div>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardHeader>
+            <h3 className="font-semibold">Questions</h3>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-6">
+              <div>
+                <div className="flex justify-between mb-2">
+                  <span className="text-sm text-gray-500">Positive</span>
+                  <span className="text-sm font-medium">65%</span>
+                </div>
+                <div className="h-2 bg-gray-100 rounded-full">
+                  <div className="h-2 bg-green-500 rounded-full w-[65%]"></div>
+                </div>
+              </div>
+              <div>
+                <div className="flex justify-between mb-2">
+                  <span className="text-sm text-gray-500">Neutral</span>
+                  <span className="text-sm font-medium">25%</span>
+                </div>
+                <div className="h-2 bg-gray-100 rounded-full">
+                  <div className="h-2 bg-gray-500 rounded-full w-[25%]"></div>
+                </div>
+              </div>
+              <div>
+                <div className="flex justify-between mb-2">
+                  <span className="text-sm text-gray-500">Negative</span>
+                  <span className="text-sm font-medium">10%</span>
+                </div>
+                <div className="h-2 bg-gray-100 rounded-full">
+                  <div className="h-2 bg-red-500 rounded-full w-[10%]"></div>
+                </div>
+              </div>
+              <div className="mt-6">
+                <h4 className="font-medium mb-4">Common Keywords</h4>
+                <div className="flex flex-wrap gap-2">
+                  <span className="px-3 py-1 bg-gray-50 border border-gray-100 rounded-full text-sm">
+                    amazing
+                  </span>
+                  <span className="px-3 py-1 bg-gray-50 border border-gray-100 rounded-full text-sm">
+                    love it
+                  </span>
+                  <span className="px-3 py-1 bg-gray-50 border border-gray-100 rounded-full text-sm">
+                    great
+                  </span>
+                </div>
+              </div>
             </div>
           </CardContent>
         </Card>
       </div>
-
-      <Card>
-        <CardHeader>
-          <CardTitle>Recent Activity</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="space-y-4">
-            <div className="flex items-center space-x-4">
-              <div className="w-10 h-10 rounded-full bg-gray-200" />
-              <div className="space-y-1">
-                <p className="text-sm">
-                  New comment on your post "Launch Update"
-                </p>
-                <p className="text-xs text-muted-foreground">5 minutes ago</p>
-              </div>
-            </div>
-            <div className="flex items-center space-x-4">
-              <div className="w-10 h-10 rounded-full bg-gray-200" />
-              <div className="space-y-1">
-                <p className="text-sm">Post scheduled "Weekly Newsletter"</p>
-                <p className="text-xs text-muted-foreground">1 hour ago</p>
-              </div>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
     </div>
   );
 }

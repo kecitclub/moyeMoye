@@ -16,6 +16,7 @@ import {
   ChartNoAxesCombined,
   ChevronUp,
   House,
+  MessageSquareMore,
   Moon,
   PenLine,
   Plus,
@@ -57,6 +58,11 @@ const items = [
     title: "Analytics",
     url: "/analytics",
     icon: ChartNoAxesCombined,
+  },
+  {
+    title: "Replies",
+    url: "/replies",
+    icon: MessageSquareMore,
   },
 ];
 

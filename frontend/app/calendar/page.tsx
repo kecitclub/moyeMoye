@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { ChevronLeft, ChevronRight, Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
@@ -10,10 +10,11 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Post } from "@/components/calendar/types/calendar";
 import { CalendarView } from "@/components/calendar/calendar-view";
 import { UpcomingPosts } from "@/components/calendar/upcoming-posts";
 import SchedulePostDialog from "@/components/dialogs/schedule-post-dialog";
+import { API_URL } from "@/constants/constants";
+import { Post, POSTS } from "./posts";
 
 const MONTHS = [
   "January",
@@ -30,56 +31,27 @@ const MONTHS = [
   "December",
 ];
 
-// Enhanced sample data with more posts and times
-const SAMPLE_POSTS: Post[] = [
-  {
-    id: "1",
-    title: "Product Launch: New Winter Collection",
-    scheduledFor: "2025-01-01T09:00:00.000Z",
-    type: "product",
-  },
-  {
-    id: "2",
-    title: "Holiday Gift Guide",
-    scheduledFor: "2025-01-02T10:30:00.000Z",
-    type: "holiday",
-  },
-  {
-    id: "3",
-    title: "Holiday Special Collection",
-    scheduledFor: "2025-01-25T12:00:00.000Z",
-    type: "holiday",
-  },
-  {
-    id: "4",
-    title: "End of Year Sale",
-    scheduledFor: "2025-01-15T15:00:00.000Z",
-    type: "product",
-  },
-  {
-    id: "5",
-    title: "New Year Sneak Peek",
-    scheduledFor: "2025-01-15T16:30:00.000Z",
-    type: "general",
-  },
-  {
-    id: "6",
-    title: "Customer Spotlight",
-    scheduledFor: "2025-01-15T14:00:00.000Z",
-    type: "general",
-  },
-  {
-    id: "7",
-    title: "Holiday Tips & Tricks",
-    scheduledFor: "2025-01-20T11:00:00.000Z",
-    type: "holiday",
-  },
-];
-
 export default function ContentCalendar() {
   const [currentDate, setCurrentDate] = useState(new Date());
   const [selectedDate, setSelectedDate] = useState<number>();
-  const [posts, setPosts] = useState<Post[]>(SAMPLE_POSTS);
+  const [posts, setPosts] = useState(POSTS);
+  const [postFrequency, setPostFrequency] = useState("every-week");
+
+  // useEffect(() => {
+  //   async function getPosts() {
+  //     const response = await fetch(`${API_URL}/populate-posts`, {
+  //       cache: "no-store",
+  //     });
+  //     const data = await response.json();
+  //     console.log(data);
+  //   }
+
+  //   getPosts();
+  // }, []);
+
+  const onPostAdd = (post: Post) => {
+    setPosts([...posts, post]);
+  };
 
   const handlePrevMonth = () => {
     setCurrentDate(new Date(currentDate.setMonth(currentDate.getMonth() - 1)));
@@ -89,8 +61,8 @@ export default function ContentCalendar() {
     setCurrentDate(new Date(currentDate.setMonth(currentDate.getMonth() + 1)));
   };
 
-  const handleDeletePost = (postId: string) => {
-    setPosts(posts.filter((post) => post.id !== postId));
+  const handleDeletePost = (name: string) => {
+    setPosts(posts.filter((post) => post.name !== name));
   };
 
   return (
@@ -103,21 +75,17 @@ export default function ContentCalendar() {
           </p>
         </div>
         <div className="flex items-center space-x-4">
-          {/* <Button className="bg-purple-600 hover:bg-purple-700">
-            <Plus className="mr-2 h-4 w-4" />
-            Schedule Post
-          </Button> */}
-          <SchedulePostDialog />
-          {/* <Select defaultValue="month">
-            <SelectTrigger className="w-[180px]">
-              <SelectValue placeholder="View" />
+          <Select value={postFrequency} onValueChange={setPostFrequency}>
+            <SelectTrigger className="w-40">
+              <SelectValue placeholder="Post frequency" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="month">Month View</SelectItem>
-              <SelectItem value="week">Week View</SelectItem>
-              <SelectItem value="day">Day View</SelectItem>
+              <SelectItem value="every-day">Every day</SelectItem>
+              <SelectItem value="every-3-days">Every 3 days</SelectItem>
+              <SelectItem value="every-week">Every week</SelectItem>
             </SelectContent>
-          </Select> */}
+          </Select>
+          <SchedulePostDialog onPostAdd={onPostAdd} />
         </div>
       </div>
 
@@ -133,13 +101,6 @@ export default function ContentCalendar() {
             <ChevronRight className="h-4 w-4" />
           </Button>
         </div>
-        <Button
-          variant="ghost"
-          className="text-purple-600"
-          onClick={() => setCurrentDate(new Date())}
-        >
-          Today
-        </Button>
       </div>
 
       <CalendarView

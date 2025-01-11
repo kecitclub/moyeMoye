@@ -5,8 +5,8 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-import { Post } from "./types/calendar";
 import { useRouter } from "next/navigation";
+import { Post } from "@/app/calendar/posts";
 
 interface CalendarCellProps {
   date: number;
@@ -50,24 +50,24 @@ export function CalendarCell({
 
       <div className="mt-1 space-y-1">
         {posts.slice(0, 3).map((post) => (
-          <TooltipProvider key={post.id}>
+          <TooltipProvider key={post.name}>
             <Tooltip>
               <TooltipTrigger asChild>
                 <div
                   className={cn(
                     "text-xs rounded-md p-1.5 border truncate",
-                    getPostTypeColor(post.type)
+                    "bg-purple-100 text-purple-700 border-purple-200"
                   )}
                   onClick={() => {
-                    router.push("/post/scheduled/1");
+                    router.push(`/post/scheduled/${post.id}`);
                   }}
                 >
-                  {post.title}
+                  {post.name}
                 </div>
               </TooltipTrigger>
               <TooltipContent>
                 <div className="text-sm">
-                  <p className="font-medium">{post.title}</p>
+                  <p className="font-medium">{post.name}</p>
                   <p className="text-xs text-muted-foreground">
                     {new Date(post.scheduledFor).toLocaleTimeString([], {
                       hour: "2-digit",

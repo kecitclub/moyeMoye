@@ -40,6 +40,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from "../ui/select";
+import { API_URL } from "@/constants/constants";
+import { Post } from "@/app/calendar/posts";
 
 const formSchema = z.object({
   date: z.date({
@@ -51,7 +53,11 @@ const formSchema = z.object({
   text: z.string().optional(),
 });
 
-export default function SchedulePostDialog() {
+export default function SchedulePostDialog({
+  onPostAdd,
+}: {
+  onPostAdd: (post: Post) => void;
+}) {
   const [open, setOpen] = React.useState(false);
   const [date, setDate] = React.useState<Date>();
 
@@ -64,22 +70,45 @@ export default function SchedulePostDialog() {
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
+    defaultValues: {
+      date: date,
+      vibes: "",
+      product: "",
+      postType: "image_only",
+      text: "",
+    },
   });
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
     try {
-      // Simulate API call
-      await new Promise((resolve) => setTimeout(resolve, 1000));
+      console.log("Form submitted:", values);
 
-      console.log(values);
-      setOpen(false);
+      const formattedDate = format(values.date, "yyyy-MM-dd");
+
+      const formData = new FormData();
+      formData.append("scheduled_date", formattedDate);
+      formData.append("vibe", values.vibes);
+      formData.append("product_name", values.product);
+      formData.append("post_type", values.postType);
+      formData.append("text", values.text || "");
+      formData.append("brand", "1");
+      formData.append("product", "1");
+
+      const response = await fetch(`${API_URL}/api/scheduled-posts/`, {
+        method: "POST",
+        body: formData,
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to submit form");
+      }
+
+      const data = await response.json();
+      console.log("API response:", data);
       form.reset();
-
-      // You can add a toast notification here if you want
-      alert("Post scheduled successfully!");
+      handleOpenChange(false);
     } catch (error) {
-      console.error("Error scheduling post:", error);
-      alert("Failed to schedule post. Please try again.");
+      console.error("Form submission error:", error);
     }
   }
 

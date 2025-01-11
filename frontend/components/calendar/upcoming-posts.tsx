@@ -2,7 +2,9 @@
 
 import { Pencil, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Post } from "@/components/calendar/types/calendar";
+import { Post } from "@/app/calendar/posts";
+import Image from "next/image";
+import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
 
 interface UpcomingPostsProps {
   posts: Post[];
@@ -17,13 +19,26 @@ export function UpcomingPosts({ posts, onEdit, onDelete }: UpcomingPostsProps) {
       <div className="space-y-2">
         {posts.map((post) => (
           <div
-            key={post.id}
+            key={post.name}
             className="flex items-center justify-between p-4 rounded-lg border bg-card"
           >
             <div className="flex items-center space-x-4">
-              <div className="w-12 h-12 bg-gray-100 rounded" />
+              {/* <div className="w-12 h-12 bg-gray-100 rounded" /> */}
+              {/* <Image
+                src={post.posts[0].url}
+                alt={`${post.name}_image`}
+                width={12}
+                height={12}
+              /> */}
+              <Avatar className="w-14 h-14 rounded-full">
+                <AvatarImage
+                  src={post.posts[0].url}
+                  className="object-cover w-full h-full rounded-full"
+                />
+                <AvatarFallback>{post.name}</AvatarFallback>
+              </Avatar>
               <div>
-                <h3 className="font-medium">{post.title}</h3>
+                <h3 className="font-medium">{post.name}</h3>
                 <p className="text-sm text-muted-foreground">
                   Scheduled for{" "}
                   {new Date(post.scheduledFor).toLocaleDateString()}
@@ -37,7 +52,7 @@ export function UpcomingPosts({ posts, onEdit, onDelete }: UpcomingPostsProps) {
               <Button
                 variant="ghost"
                 size="icon"
-                onClick={() => onDelete(post.id)}
+                onClick={() => onDelete(post.name)}
               >
                 <Trash2 className="h-4 w-4" />
               </Button>
