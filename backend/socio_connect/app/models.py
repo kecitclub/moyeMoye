@@ -50,8 +50,9 @@ class SchedulePost(models.Model):
     
     brand = models.ForeignKey(Brand, on_delete=models.CASCADE, related_name='scheduled_posts')
     product = models.ForeignKey(AddProduct, on_delete=models.CASCADE, related_name='scheduled_posts')
-    post_image = models.ImageField(upload_to='scheduled_post_images/')
-    post_caption = models.CharField(max_length=255)
+    product_name = models.CharField(max_length=255, null=True)
+    post_image = models.ImageField(upload_to='scheduled_post_images/',null=True)
+    post_caption = models.CharField(max_length=255,null=True)
     post_type = models.CharField(
         max_length=20,
         choices=POST_TYPE_CHOICES,
@@ -59,9 +60,38 @@ class SchedulePost(models.Model):
     )
     scheduled_date = models.DateTimeField()
     date_created = models.DateTimeField(auto_now_add=True)
+    vibe = models.CharField(
+        max_length=50,
+        default='professional'
+    )
+    text = models.CharField(max_length=255)
 
     def __str__(self):
         return f"Scheduled post for {self.product.product_name} on {self.scheduled_date.strftime('%Y-%m-%d')}"
 
     class Meta:
         ordering = ['scheduled_date']
+        
+
+
+class FestivalPost(models.Model):
+    FESTIVAL_CHOICES = [
+        ('lohsar', 'Sonam Losar'),
+        ('maghe_sankranti', 'Maghe Sankranti'),
+        ('saraswati_puja', 'Saraswati Puja'),
+    ]
+
+    festival = models.CharField(max_length=100, choices=FESTIVAL_CHOICES)
+    festival_date = models.DateTimeField()
+    caption = models.TextField()
+    image_url = models.URLField(max_length=300)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        ordering = ['festival_date']
+        verbose_name = 'Festival Post'
+        verbose_name_plural = 'Festival Posts'
+
+    def __str__(self):
+        return f"{self.get_festival_display()} - {self.festival_date.strftime('%Y-%m-%d')}"

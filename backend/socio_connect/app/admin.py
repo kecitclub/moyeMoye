@@ -63,6 +63,7 @@ class SchedulePostAdmin(admin.ModelAdmin):
         'display_image', 
         'brand', 
         'product', 
+        'product_name',
         'post_type',
         'scheduled_date',
         'posting_status'

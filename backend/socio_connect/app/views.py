@@ -1,3 +1,7 @@
+import os
+import io
+import sys
+import requests
 from rest_framework import generics
 from .models import Brand, AddProduct, Post, SchedulePost
 from .serializers import BrandSerializer, AddProductSerializer, PostSerializer,SchedulePostSerializer
@@ -6,20 +10,23 @@ from rest_framework.response import Response
 from rest_framework import status,viewsets
 from rest_framework.decorators import action
 from django.core.files.base import ContentFile
-import os
-import sys
-import io
 
 
+# base_path = r"C:\\Users\\mishr\\moyeMoye\\models\\genAndText.py"
+# model_path = os.path.join(base_path, "models")
 
-base_path = "/home/ashish/MyPC/Hackathons/Dristi/moyeMoye"
-model_path = os.path.join(base_path, "models")
+# # Add the model_path to sys.path
+# sys.path.append(model_path)
 
-# Add the model_path to sys.path
-sys.path.append(model_path)
+import importlib.util
 
-from image_gen_final import chat, generate_freepik_image, create_image_prompt
+spec = importlib.util.spec_from_file_location("genAndText", "C:/Users/mishr/moyeMoye/models/untitled19.py")
+genAndText = importlib.util.module_from_spec(spec)
+spec.loader.exec_module(genAndText)
 
+product_photo = genAndText.product_photo
+festive_photo = genAndText.festive_photo
+add_smart_text = genAndText.add_smart_text
 
 class BrandListCreateView(generics.ListCreateAPIView):
     queryset = Brand.objects.all()
@@ -54,17 +61,24 @@ def upload_to_cloudinary(file):
     print("Uploadeddddddd")
     return response.get("secure_url")  # Return the public URL of the uploaded image
 
+def upload_pil_image_to_cloudinary(pil_image):
+    try:
+        # Convert PIL image to byte stream
+        byte_stream = BytesIO()
+        pil_image.save(byte_stream, format='JPEG', quality=90)
+        byte_stream.seek(0)
 
-from rest_framework.views import APIView
-from rest_framework.response import Response
-from rest_framework import status
-from .serializers import PostSerializer
-import requests
-
+        # Upload to Cloudinary
+        response = cloudinary.uploader.upload(byte_stream, resource_type="image")
+        return response['secure_url']
+    except Exception as e:
+        print(f"Cloudinary upload error: {str(e)}")
+        return None
 
 ACCESS_TOKEN = "EAAMqvStx3vIBO2QmgKMXXeqbbBiBhq0mF9sdPZCoeOcM7hMLnIAwb729EnceogO7RtJqfnmlLef5fvr9igsVdQm7wzOq6gjYBQik7MKvHfSZAEHteexszZCzZBZBqDBVqIlcbt2vjHG7C3fLGADZA7kDm61NWqoUObZCgc9AMcXdZCqHDTmgw1U2t733lc7NdB2e"
 INSTAGRAM_ACCOUNT_ID = "17841471750023527"
 
+# class for instant post
 class InstagramPostView(APIView):
     def post(self, request, *args, **kwargs):
         serializer = PostSerializer(data=request.data)
@@ -113,94 +127,238 @@ class InstagramPostView(APIView):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
-class SchedulePostViewSet(viewsets.ModelViewSet):
-    queryset = SchedulePost.objects.all()
-    serializer_class = SchedulePostSerializer
+# views.py
+from rest_framework.views import APIView
+from rest_framework.response import Response
+from rest_framework import status
+from datetime import datetime
+import io
+from io import BytesIO
 
-    @action(detail=False, methods=['post'])
-    def create_scheduled_post(self, request):
+class SchedulePostAPIView(APIView):
+    def post(self, request):
         try:
-            # Extract data from request
-            product_id = request.data.get('product')
-            brand_id = request.data.get('brand')
-            caption = request.data.get('caption', '')
-            vibe = request.data.get('vibe', 'professional')
-            post_type = request.data.get('post_type', 'image_only')
-            scheduled_date = request.data.get('scheduled_date')
+            # Extract and validate required data
+            required_fields = {
+                'product': request.data.get('product'),
+                'brand': request.data.get('brand'),
+                'product_name': request.data.get('product_name'),
+                'scheduled_date': request.data.get('scheduled_date')
+            }
+            print('data fetched from user')
 
-            # Validate input
-            if not all([product_id, brand_id, scheduled_date]):
+            # Check for missing required fields
+            missing_fields = [field for field, value in required_fields.items() if not value]
+            if missing_fields:
                 return Response(
-                    {"error": "Product, brand, and scheduled date are required"}, 
+                    {"error": f"Missing required fields: {', '.join(missing_fields)}"},
                     status=status.HTTP_400_BAD_REQUEST
                 )
 
+            # Get optional fields with defaults
+            post_image = request.data.get('product_image')
+            vibe = request.data.get('vibe', 'professional')
+            post_type = request.data.get('post_type', 'image_only')
+            post_caption = request.data.get('text', '')
+
+            # Validate scheduled date format
+            try:
+                scheduled_date = datetime.strptime(required_fields['scheduled_date'], '%Y-%m-%d')
+            except ValueError:
+                return Response(
+                    {"error": "Invalid date format. Use YYYY-MM-DD"},
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+            
+            print('validation part done')
+
             # Get product and brand instances
             try:
-                product = AddProduct.objects.get(id=product_id)
-                brand = Brand.objects.get(id=brand_id)
-            except (AddProduct.DoesNotExist, Brand.DoesNotExist):
+                product = AddProduct.objects.select_related('brand').get(id=required_fields['product'])
+                brand = Brand.objects.get(id=required_fields['brand'])
+
+                if product.brand.id != brand.id:
+                    return Response(
+                        {"error": "Product does not belong to the specified brand"},
+                        status=status.HTTP_400_BAD_REQUEST
+                    )
+
+            except AddProduct.DoesNotExist:
                 return Response(
-                    {"error": "Invalid product or brand ID"}, 
+                    {"error": f"Product with ID {required_fields['product']} not found"},
+                    status=status.HTTP_404_NOT_FOUND
+                )
+            except Brand.DoesNotExist:
+                return Response(
+                    {"error": f"Brand with ID {required_fields['brand']} not found"},
                     status=status.HTTP_404_NOT_FOUND
                 )
 
-            # Generate image prompt using AI
-            prompt = create_image_prompt(
-                product=product.product_name,
-                vibe=vibe
-            )
-            
-            # Get refined prompt from chat model
-            refined_prompt = chat(prompt)
-            
-            # Generate image using Freepik
-            generated_image = generate_freepik_image(refined_prompt)
-            
-            if generated_image is None:
-                return Response(
-                    {"error": "Failed to generate image"}, 
-                    status=status.HTTP_500_INTERNAL_SERVER_ERROR
-                )
+            # Generate image
 
-            # Convert PIL Image to file
-            image_io = io.BytesIO()
-            generated_image.save(image_io, format='JPEG')
-            image_io.seek(0)
-
-            # Upload to Cloudinary
             try:
-                cloudinary_url = upload_to_cloudinary(image_io)
+                print('start generating')
+                generated_image, p = product_photo(
+                    required_fields['product_name'],
+                    vibe,
+                    prod_size=0.55,
+                    table=False,
+                    prod_img='C:\\Users\\mishr\\moyeMoye\\models\\models_assets\\file.png'
+                )
+                
+                
+                
+                if not generated_image:
+                    return Response(
+                        {"error": "Failed to generate image"},
+                        status=status.HTTP_500_INTERNAL_SERVER_ERROR
+                    )
+                print('generation completed')
+
+                # Upload the PIL Image directly to Cloudinary
+                cloudinary_url = upload_pil_image_to_cloudinary(generated_image)
+                
+                if not cloudinary_url:
+                    return Response(
+                        {"error": "Failed to upload image to Cloudinary"},
+                        status=status.HTTP_500_INTERNAL_SERVER_ERROR
+                    )
+                print("The url ", cloudinary_url)
+
             except Exception as e:
                 return Response(
-                    {"error": f"Failed to upload to Cloudinary: {str(e)}"}, 
+                    {"error": f"Image processing failed: {str(e)}"},
                     status=status.HTTP_500_INTERNAL_SERVER_ERROR
                 )
 
-            # Create SchedulePost instance
-            scheduled_post = SchedulePost(
-                brand=brand,
-                product=product,
-                post_caption=caption,
-                post_type=post_type,
-                scheduled_date=scheduled_date
-            )
-            
-            # Save the Cloudinary URL to post_image field
-            scheduled_post.post_image = cloudinary_url
-            scheduled_post.save()
+            # Create and save SchedulePost instance
+            try:
+                scheduled_post = SchedulePost.objects.create(
+                    brand=brand,
+                    product=product,
+                    post_caption="Generated Caption",
+                    post_type=post_type,
+                    scheduled_date=scheduled_date,
+                    post_image=cloudinary_url
+                )
 
-            # Return custom response
-            response_data = {
-                "caption": "GyanuChor",
-                "image_url": cloudinary_url,
-                # "post_details": self.get_serializer(scheduled_post).data
-            }
+                response_data = {
+                    "message": "Scheduled post created successfully",
+                    "post_id": scheduled_post.id,
+                    "image_url": cloudinary_url,
+                    "scheduled_date": scheduled_date.strftime('%Y-%m-%d'),
+                    "post_type": post_type
+                }
 
-            return Response(response_data, status=status.HTTP_201_CREATED)
+                return Response(response_data, status=status.HTTP_201_CREATED)
+
+            except ValidationError as e:
+                return Response(
+                    {"error": f"Failed to create scheduled post: {str(e)}"},
+                    status=status.HTTP_400_BAD_REQUEST
+                )
 
         except Exception as e:
             return Response(
-                {"error": str(e)}, 
+                {"error": f"Unexpected error: {str(e)}"},
                 status=status.HTTP_500_INTERNAL_SERVER_ERROR
             )
+        
+
+
+# CREATING THE FESTIVE POSTSS:::
+
+# views.py
+from django.shortcuts import render
+from django.http import JsonResponse
+from django.views.decorators.http import require_http_methods
+from django.contrib.admin.views.decorators import staff_member_required
+from django.db import transaction
+from datetime import datetime
+from .models import FestivalPost
+from moyeMoye.backend.socio_connect.media.festivScript import create_festival_dictionary
+
+@staff_member_required
+@require_http_methods(["POST"])
+@transaction.atomic
+def populate_festival_posts(request):
+    try:
+        # Check if posts already exist
+        if FestivalPost.objects.exists():
+            return JsonResponse({
+                'status': 'error',
+                'message': 'Festival posts already exist in the database. Please clear existing data first.'
+            }, status=400)
+
+        # Get festival data from script
+        festival_data = create_festival_dictionary()
+        posts_created = 0
+
+        # Create posts for each festival
+        for festival, data in festival_data.items():
+            festival_date = datetime.strptime(data['date'], '%Y-%m-%dT%H:%M:%S.%fZ')
+            
+            for post in data['posts']:
+                FestivalPost.objects.create(
+                    festival=festival,
+                    festival_date=festival_date,
+                    caption=post['caption'],
+                    image_url=post['url']
+                )
+                posts_created += 1
+
+        return JsonResponse({
+            'status': 'success',
+            'message': f'Successfully created {posts_created} festival posts',
+            'posts_created': posts_created
+        })
+
+    except Exception as e:
+        return JsonResponse({
+            'status': 'error',
+            'message': str(e)
+        }, status=500)
+
+@require_http_methods(["GET"])
+def get_festival_posts(request, festival=None):
+    try:
+        if festival:
+            posts = FestivalPost.objects.filter(festival=festival)
+        else:
+            posts = FestivalPost.objects.all()
+
+        posts_data = []
+        for post in posts:
+            posts_data.append({
+                'festival': post.get_festival_display(),
+                'festival_date': post.festival_date.isoformat(),
+                'caption': post.caption,
+                'image_url': post.image_url
+            })
+
+        return JsonResponse({
+            'status': 'success',
+            'posts': posts_data
+        })
+
+    except Exception as e:
+        return JsonResponse({
+            'status': 'error',
+            'message': str(e)
+        }, status=500)
+
+@staff_member_required
+@require_http_methods(["DELETE"])
+@transaction.atomic
+def clear_festival_posts(request):
+    try:
+        deleted_count = FestivalPost.objects.all().delete()[0]
+        return JsonResponse({
+            'status': 'success',
+            'message': f'Successfully deleted {deleted_count} festival posts'
+        })
+    except Exception as e:
+        return JsonResponse({
+            'status': 'error',
+            'message': str(e)
+        }, status=500)
